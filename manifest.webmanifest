@@ -1,6 +1,6 @@
 {
-  "name": "GME HRMS Professional",
-  "short_name": "GME HRMS",
+  "name": "GME HRMS Professional v4.1",
+  "short_name": "GME HRMS v4.1",
   "description": "Offline-first HRMS for GME Marketing.",
   "start_url": "./index.html",
   "scope": "./",

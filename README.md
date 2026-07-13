@@ -1,4 +1,4 @@
-# GME HRMS Professional v4.0 PWA
+# GME HRMS Professional v4.1 PWA
 
 ## Important privacy warning
 This repository must contain only the application files. Do **not** upload employee backup JSON files, receipts, contracts, IC details, salary data, or other employee records to a public GitHub repository.
@@ -20,7 +20,7 @@ Open the GitHub Pages URL in Safari → Share → Add to Home Screen.
 ## Install on Android / desktop Chrome
 Open the site and use the **Install App** button or browser installation icon.
 
-## v4.0 changes
+## v4.1 changes
 - GitHub Pages and PWA support.
 - Offline caching after first successful visit.
 - Mobile menu and touch-friendly form controls.
@@ -31,3 +31,10 @@ Open the site and use the **Install App** button or browser installation icon.
 
 ## Payroll caution
 This offline app provides payroll estimates. Confirm EPF, SOCSO and EIS amounts against the latest official schedules before statutory submission.
+
+
+## v4.1 mobile changes
+- Bottom navigation for Home, Staff, Payroll and Claims.
+- Document previews stay hidden until generated.
+- Improved touch targets and mobile form spacing.
+- Responsive A4 preview scaling on phones.
