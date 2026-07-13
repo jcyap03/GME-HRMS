@@ -1,0 +1,6 @@
+*.json
+!manifest.webmanifest
+Backups/
+backup/
+receipts/
+employee-data/
