@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GME HRMS Professional v3.1.5</title>
+<style>
+:root{--dark:#111;--line:#111;--light:#efefef;--soft:#fafafa;--yellow:#f6c343;--green:#087a2a;--red:#b00020}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f5f7;color:#111}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:#111;color:#fff;padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.sidebar h1{font-size:18px;margin:0 0 4px}.sidebar p{font-size:12px;color:#ddd;margin:0 0 18px}
+.nav button{width:100%;margin:5px 0;padding:11px;border:0;border-radius:8px;background:#222;color:#fff;text-align:left;font-weight:800;cursor:pointer}
+.nav button.active,.nav button:hover{background:var(--yellow);color:#111}
+.main{padding:18px}.page{display:block}.hidden{display:none!important}
+.card{background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 2px 8px #0001;margin-bottom:14px}
+.card h2{margin:0;padding:14px 16px;border-bottom:1px solid #ddd;font-size:18px}
+.card-body{padding:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+label{font-weight:700;font-size:12px;margin-bottom:4px;display:block}
+input,select,textarea{width:100%;padding:9px;border:1px solid #bbb;border-radius:6px;font:inherit;background:#fff}
+input[type=number]{text-align:right}.btn{border:0;border-radius:7px;padding:10px 13px;font-weight:800;cursor:pointer;background:#111;color:#fff;margin:4px 4px 4px 0}
+.btn.yellow{background:var(--yellow);color:#111}.btn.secondary{background:#eee;color:#111;border:1px solid #ccc}.btn.green{background:var(--green)}.btn.red{background:var(--red)}
+.table{width:100%;border-collapse:collapse}.table th,.table td{border:1px solid #ddd;padding:9px;text-align:left}.table th{background:#eee}
+.stat{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px}.stat b{font-size:24px;display:block}.note{font-size:12px;color:#555}
+
+/* Professional fixed print forms */
+.print-area{display:block}
+.a4{width:210mm;height:297mm;background:#fff;margin:10px auto;padding:9mm;box-shadow:0 3px 12px #0004;border:1px solid #222;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#000}
+.a4-header{display:grid;grid-template-columns:1fr 46mm;gap:8mm;align-items:center;border-bottom:2px solid #111;padding-bottom:5mm;margin-bottom:5mm}
+.a4-company h1{font-size:18pt;margin:0 0 1mm}.a4-company p{font-size:8.8pt;margin:.5mm 0;line-height:1.2}
+.a4-title{border-left:2px solid #111;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:16pt;font-weight:900;line-height:1.05;text-decoration:underline}
+.rule{border:1.2px solid #111;background:#fafafa;padding:3mm;font-size:8.8pt;line-height:1.35;margin-bottom:4mm}.rule ol{margin:1mm 0 0 5mm;padding:0}
+.fx2{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:4mm}.fx3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7mm}
+.fbox{border:1.2px solid #111;margin-bottom:4mm}.fhead{background:#eee;border-bottom:1.2px solid #111;font-size:10pt;font-weight:900;padding:2mm 2.5mm}
+.frow{display:grid;grid-template-columns:35mm 1fr;min-height:8mm;border-bottom:1px solid #bbb}.frow:last-child{border-bottom:0}
+.flabel{font-size:8.8pt;font-weight:800;padding:2mm;background:#fafafa}.fval{padding:1.7mm 2mm;font-size:9pt}
+.line{border-bottom:1px dotted #777;min-height:5mm}.multi-line{border-bottom:1px dotted #777;min-height:9mm;margin-bottom:1mm}
+.check-table{width:100%;border-collapse:collapse;font-size:9pt}.check-table td{width:50%;padding:2.2mm 3mm;border:0;vertical-align:middle;white-space:nowrap}
+.boxchk{display:inline-block;width:4mm;height:4mm;border:1.2px solid #111;margin-right:4mm;vertical-align:middle}
+.reason-lines{padding:3mm}.reason-lines .label-line{display:grid;grid-template-columns:35mm 1fr;gap:3mm;font-size:9pt;font-weight:800}
+.signature{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9mm;margin-top:8mm}.sig{border-top:1.4px solid #111;text-align:center;padding-top:2mm;font-size:9pt}.sig small{display:block;font-size:7.5pt;font-style:italic;margin-top:1mm}
+.footer{text-align:center;font-size:7.5pt;color:#444;margin-top:3mm}
+.payslip-grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm}.ptable{width:100%;border-collapse:collapse;font-size:8.6pt;margin-bottom:4mm}.ptable th,.ptable td{border:1.2px solid #111;padding:1.8mm}.ptable th{background:#eee;text-align:left}.right{text-align:right}.total td{font-weight:900;background:#f1f1f1}
+.net{border:2px solid #111;display:grid;grid-template-columns:1fr 42mm;padding:3mm;font-weight:900}.net .amt{text-align:right;font-size:16pt}
+.blankline{display:inline-block;border-bottom:1px dotted #777;min-width:48mm;height:4mm}
+@page{size:A4 portrait;margin:0}
+@media print{
+ body{background:#fff}.sidebar,.no-print,.card:not(.print-area),.nav{display:none!important}.app,.main{display:block;padding:0}
+ .page{display:none!important}.page.printing{display:block!important}
+ .a4{margin:0;width:210mm;height:297mm;box-shadow:none;border:0}
+}
+@media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.grid2,.grid3{grid-template-columns:1fr}.main{padding:10px}}
+
+/* Employment Contract alignment fix */
+.contract-a4 .a4-header{margin-bottom:4mm}
+.contract-section{border:1.2px solid #111;margin-bottom:3.2mm}
+.contract-section-title{background:#eee;border-bottom:1.2px solid #111;font-size:9.4pt;font-weight:900;padding:1.8mm 2.3mm}
+.contract-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm;margin-bottom:3.5mm}
+.contract-row{display:grid;grid-template-columns:34mm 1fr;min-height:7.2mm;border-bottom:1px solid #bbb}
+.contract-row:last-child{border-bottom:0}
+.contract-label{font-size:8.2pt;font-weight:800;padding:1.7mm 2mm;background:#fafafa}
+.contract-value{padding:1.5mm 2mm;font-size:8.5pt}
+.contract-line{border-bottom:1px dotted #777;min-height:4.6mm}
+.contract-text{padding:2.5mm 3mm;font-size:8.1pt;line-height:1.33}
+.contract-text ol{margin:0 0 0 5mm;padding:0}
+.contract-remarks{padding:3mm}
+.contract-remarks .multi-line{min-height:6.2mm}
+.contract-signature{display:grid;grid-template-columns:1fr 1fr;gap:16mm;margin-top:6mm}
+.contract-signature .sig{font-size:8.6pt}
+.contract-a4 .footer{margin-top:2mm}
+
+
+/* Backup Manager */
+.backup-modal{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;z-index:9999;padding:18px}
+.backup-modal.open{display:flex}
+.backup-dialog{width:min(680px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+.backup-dialog h3{margin:0;padding:18px 20px;background:#111;color:#fff;font-size:19px}
+.backup-dialog .content{padding:20px;line-height:1.45}
+.backup-dialog .actions{padding:0 20px 20px;display:flex;gap:9px;flex-wrap:wrap}
+.backup-dialog .actions .btn{flex:1;min-width:135px}
+.backup-status{padding:12px;border-radius:8px;background:#f3f3f3;font-size:13px}
+.backup-status.good{background:#e7f6eb;color:#075f25;border:1px solid #acd8b8}
+.backup-status.warn{background:#fff4d8;color:#6b4c00;border:1px solid #efd07b}
+.backup-manager-btn{margin-top:14px!important;background:#f6c343!important;color:#111!important;text-align:center!important}
+.backup-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.backup-info{border:1px solid #ddd;border-radius:9px;padding:12px;background:#fafafa}
+.backup-info small{display:block;color:#666;font-weight:700;margin-bottom:4px}
+.backup-info b{font-size:15px;word-break:break-word}
+.backup-history{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.backup-history th,.backup-history td{border:1px solid #ddd;padding:7px;text-align:left}
+.backup-history th{background:#eee}
+.backup-badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;background:#eee}
+.backup-badge.good{background:#dff4e5;color:#075f25}.backup-badge.warn{background:#fff0c4;color:#6b4c00}
+@media(max-width:600px){.backup-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar no-print">
+<h1>GME HRMS Pro v3.1.5</h1><p>Offline HRMS · Existing data kept</p>
+<div class="nav">
+<button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+<button onclick="showPage('employees',this)">Employee Master</button>
+<button onclick="showPage('contract',this)">Employment Contract</button>
+<button onclick="showPage('payroll',this)">Payroll & Payslip</button>
+<button onclick="showPage('advance',this)">Salary Advance</button>
+<button onclick="showPage('outstation',this)">Outstation Allowance</button>
+<button onclick="showPage('leave',this)">Leave Application</button>
+<button onclick="showPage('exception',this)">Attendance Exception</button>
+<button onclick="showPage('assets',this)">Asset Issue</button>
+<button onclick="showPage('vehicles',this)">Vehicle Assignment</button>
+<button onclick="showPage('expenses',this)">Expense Management</button>
+<button onclick="showPage('blankforms',this)">Blank Forms</button>
+<button onclick="showPage('reports',this)">Reports</button>
+<button onclick="showPage('settings',this)">Settings</button>
+<button class="backup-manager-btn" onclick="openBackupManager()">Backup Manager</button>
+</div>
+</aside>
+<main class="main">
+<section id="dashboard" class="page">
+<div class="card"><h2>Dashboard</h2><div class="card-body">
+<div class="grid3"><div class="stat"><b id="statEmployees">0</b>Active Employees</div><div class="stat"><b id="statAdvances">0</b>Salary Advance Records</div><div class="stat"><b id="statLeaves">0</b>Leave Records</div><div class="stat"><b id="statOutstations">0</b>Outstation Records</div><div class="stat"><b id="statExceptions">0</b>Attendance Exceptions</div><div class="stat"><b id="statAssets">0</b>Assets Issued</div><div class="stat"><b id="statVehicles">0</b>Vehicle Assignments</div><div class="stat"><b id="statPendingClaims">0</b>Pending Claims</div><div class="stat"><b id="statClaimTotal">RM 0.00</b>Claims This Month</div><div class="stat"><b id="statActivities">0</b>Staff Activities</div></div>
+<div id="dashboardBackupStatus" class="backup-status warn" style="margin-top:14px">Backup status is being checked…</div>
+<p class="note">Your work is saved automatically in this browser. Export a JSON backup regularly so the records can be restored on another device or after browser data is cleared.</p>
+<button class="btn yellow" onclick="openBackupManager()">Open Backup Manager</button><input type="file" id="importFile" class="hidden" accept="application/json,.json" onchange="importBackup(event)">
+</div></div></section>
+
+<section id="employees" class="page hidden">
+<div class="card"><h2>Employee Master</h2><div class="card-body">
+<div class="grid3">
+<div><label>Employee Name</label><input id="empName"></div><div><label>Employee ID</label><input id="empId" readonly></div><div><label>Status</label><select id="empStatus"><option>Active</option><option>Resigned</option></select></div>
+<div><label>IC No.</label><input id="empIc"></div><div><label>Position</label><input id="empPosition"></div><div><label>Department</label><input id="empDepartment"></div>
+<div><label>Bank / Account No.</label><input id="empBank"></div><div><label>EPF / KWSP No.</label><input id="empEpf"></div><div><label>SOCSO / PERKESO No.</label><input id="empSocso"></div><div><label>Income Tax / LHDN No.</label><input id="empTax"></div><div><label>Basic Salary</label><input id="empSalary" type="number" value="2000"></div><div><label>Fixed Allowance</label><input id="empAllowance" type="number" value="0"></div><div><label>Annual Leave Entitlement</label><input id="empAnnualEntitlement" type="number" value="8"></div><div><label>Sick Leave Entitlement</label><input id="empSickEntitlement" type="number" value="14"></div>
+</div><button class="btn yellow" onclick="newEmployee()">New Employee</button><button class="btn green" onclick="saveEmployee()">Save Employee</button><button class="btn red" onclick="deleteEmployee()">Delete Selected</button>
+</div></div>
+<div class="card"><h2>Employee Document Vault</h2><div class="card-body">
+<p class="note">Select an employee above, then attach documents. Documents are saved in this browser storage; export backup regularly.</p>
+<div class="grid3">
+<div><label>Document Type</label><select id="docType"><option>IC Copy</option><option>EPF Document</option><option>PERKESO / SOCSO Document</option><option>Bank Account Proof</option><option>Driving Licence</option><option>Employment Contract</option><option>Offer Letter</option><option>Warning Letter</option><option>Resignation Letter</option><option>Others</option></select></div>
+<div><label>Document File</label><input id="docFile" type="file"></div>
+<div><label>Remarks</label><input id="docRemarks"></div>
+</div>
+<button class="btn green" onclick="addEmployeeDocument()">Add Document</button>
+<table class="table" id="documentTable" style="margin-top:12px"></table>
+</div></div>
+<div class="card"><h2>Employee List</h2><div class="card-body"><table class="table" id="employeeTable"></table></div></div></section>
+
+
+<section id="contract" class="page hidden">
+<div class="card no-print"><h2>Simple Employment Contract</h2><div class="card-body">
+<div class="grid3">
+<div><label>Select Employee</label><select id="contractEmployee"></select></div>
+<div><label>Employment Start Date</label><input id="contractStartDate" type="date"></div>
+<div><label>Contract Type</label><select id="contractType"><option>Permanent</option><option>Probation</option><option>Part-Time</option><option>Fixed Term</option></select></div>
+<div><label>Probation Period</label><input id="contractProbation" value="3 months"></div>
+<div><label>Working Hours</label><input id="contractWorkingHours" value="Monday to Friday, 8:00 AM – 5:00 PM; Saturday, 8:00 AM – 1:00 PM"></div>
+<div><label>Rest Day</label><input id="contractRestDay" value="Sunday"></div>
+<div><label>Annual Leave</label><input id="contractAnnualLeave" value="8 days per year"></div>
+<div><label>Notice Period</label><input id="contractNotice" value="1 month"></div>
+<div><label>Work Location</label><input id="contractLocation" value="GME Marketing office / assigned work location"></div>
+</div>
+<label>Additional Terms / Remarks</label>
+<textarea id="contractRemarks">Employee shall follow company policies, safety requirements, confidentiality obligations, and any reasonable work instructions issued by the Company.</textarea>
+<button class="btn yellow" onclick="generateContract(false)">Generate Filled Contract</button>
+<button class="btn secondary" onclick="generateContract(true)">Generate Blank Contract</button>
+<button class="btn" onclick="printOnly('contract')">Print / Save PDF</button>
+</div></div>
+<div id="contractPrint" class="print-area"></div>
+</section>
+
+<section id="payroll" class="page hidden">
+<div class="card no-print"><h2>Payroll & Payslip</h2><div class="card-body">
+<div class="grid3">
+<div><label>Select Employee</label><select id="payEmployee" onchange="loadPayrollEmployee()"></select></div><div><label>Payroll Month</label><input id="payMonth" type="month" onchange="loadPayrollClaims();generatePayslip()"></div><div><label>Payment Date</label><input id="payDate" type="date" onchange="generatePayslip()"></div>
+<div><label>Basic Salary</label><input id="paySalary" type="number" oninput="generatePayslip()"></div><div><label>Fixed Allowance</label><input id="payAllowance" type="number" oninput="generatePayslip()"></div><div><label>Outstation Allowance</label><input id="payOutstationAllowance" type="number" value="0" oninput="generatePayslip()"></div><div><label>Commission / OT</label><input id="payCommission" type="number" value="0" oninput="generatePayslip()"></div>
+<div><label>Bonus / Adjustment</label><input id="payBonus" type="number" value="0" oninput="generatePayslip()"></div><div><label>Salary Advance Deduction</label><input id="payAdvanceDeduction" type="number" value="0" oninput="generatePayslip()"></div><div><label>Other Deduction</label><input id="payOtherDeduction" type="number" value="0" oninput="generatePayslip()"></div>
+<div><label>Approved Claims Reimbursement (Same Month)</label><input id="payClaimsReimbursement" type="number" value="0" readonly></div><div style="grid-column:span 2"><label>Claims Included</label><input id="payClaimsList" readonly placeholder="Approved claims for selected employee and payroll month"></div>
+</div><p class="note">Approved claims from the same expense month are added to the employee's total payment as reimbursement. They are shown separately and are not included in statutory salary calculations.</p><button class="btn secondary" onclick="loadPayrollClaims()">Refresh Approved Claims</button><button class="btn yellow" onclick="generatePayslip()">Generate Payslip</button><button class="btn green" onclick="markPayrollClaimsPaid()">Mark Included Claims Paid</button><button class="btn" onclick="printOnly('payroll')">Print / Save PDF</button>
+</div></div><div id="payslipPrint" class="print-area"></div></section>
+
+<section id="advance" class="page hidden">
+<div class="card no-print"><h2>Salary Advance</h2><div class="card-body">
+<div class="grid3">
+<div><label>Select Employee</label><select id="advEmployee"></select></div><div><label>Request Date</label><input id="advRequestDate" type="date" onchange="checkAdvanceRule()"></div><div><label>Payment Date</label><input id="advPaymentDate" type="date" onchange="checkAdvanceRule()"></div>
+<div><label>Requested Amount</label><input id="advAmount" type="number"></div><div><label>Deduct From Month</label><input id="advDeductMonth" type="month"></div><div><label>Monthly Deduction</label><input id="advMonthlyDeduction" type="number"></div>
+<div><label>Case Type</label><input id="advCaseType" readonly></div><div><label>Approval Status</label><select id="advStatus"><option>Pending Approval</option><option>Approved</option><option>Rejected</option></select></div><div><label>Approved By</label><input id="advApprovedBy"></div>
+</div><label>Reason / Details</label><textarea id="advReason"></textarea>
+<button class="btn green" onclick="saveAdvance()">Save Record</button><button class="btn yellow" onclick="generateAdvanceForm(false)">Generate Filled Form</button><button class="btn secondary" onclick="generateAdvanceForm(true)">Generate Blank Form</button><button class="btn" onclick="printOnly('advance')">Print / Save PDF</button>
+</div></div><div id="advancePrint" class="print-area"></div></section>
+
+
+<section id="outstation" class="page hidden">
+<div class="card no-print"><h2>Outstation Allowance</h2><div class="card-body">
+<p class="note">Default allowance: RM70 per outstation day. You may override with manual amount if needed.</p>
+<div class="grid3">
+<div><label>Select Employee</label><select id="outEmployee"></select></div>
+<div><label>Outstation Start Date</label><input id="outStart" type="date" onchange="calcOutstation()"></div>
+<div><label>Outstation End Date</label><input id="outEnd" type="date" onchange="calcOutstation()"></div>
+<div><label>No. of Days</label><input id="outDays" type="number" value="1" oninput="calcOutstation()"></div>
+<div><label>Default Rate / Day (RM)</label><input id="outRate" type="number" value="70" oninput="calcOutstation()"></div>
+<div><label>Manual Amount (Optional)</label><input id="outManualAmount" type="number" placeholder="Leave blank to auto calculate" oninput="calcOutstation()"></div>
+<div><label>Total Allowance (RM)</label><input id="outTotal" type="number" readonly></div>
+<div><label>Customer / Location</label><input id="outLocation" placeholder="e.g. Tawau / Sandakan / customer name"></div>
+<div><label>Status</label><select id="outStatus"><option>Pending Approval</option><option>Approved</option><option>Rejected</option><option>Paid</option></select></div>
+</div>
+<label>Purpose / Remarks</label><textarea id="outPurpose" placeholder="Purpose of outstation, meeting, delivery, support work, etc."></textarea>
+<button class="btn green" onclick="saveOutstation()">Save Outstation Record</button>
+<button class="btn yellow" onclick="generateOutstationForm(false)">Generate Filled Form</button>
+<button class="btn secondary" onclick="generateOutstationForm(true)">Generate Blank Form</button>
+<button class="btn" onclick="printOnly('outstation')">Print / Save PDF</button>
+</div></div>
+<div id="outstationPrint" class="print-area"></div>
+</section>
+
+<section id="leave" class="page hidden">
+<div class="card no-print"><h2>Leave Application</h2><div class="card-body">
+<div class="grid3">
+<div><label>Select Employee</label><select id="leaveEmployee"></select></div><div><label>Application Date</label><input id="leaveApplyDate" type="date"></div><div><label>Start Date</label><input id="leaveStart" type="date" onchange="calcLeaveDays()"></div>
+<div><label>End Date</label><input id="leaveEnd" type="date" onchange="calcLeaveDays()"></div><div><label>No. of Days</label><input id="leaveDays" type="number"></div><div><label>Annual Leave Balance</label><input id="leaveBalance" type="number" value="8"></div>
+<div><label>Approval Status</label><select id="leaveStatus"><option>Pending Approval</option><option>Approved</option><option>Rejected</option></select></div><div><label>Approved By</label><input id="leaveApprovedBy"></div>
+</div>
+<label>Leave Type</label><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"><label><input type="radio" name="leaveType" value="Annual Leave" checked> Annual Leave</label><label><input type="radio" name="leaveType" value="Sick Leave"> Sick Leave</label><label><input type="radio" name="leaveType" value="Emergency Leave"> Emergency Leave</label><label><input type="radio" name="leaveType" value="Unpaid Leave"> Unpaid Leave</label><label><input type="radio" name="leaveType" value="Compassionate Leave"> Compassionate Leave</label><label><input type="radio" name="leaveType" value="Others"> Others</label></div>
+<label>Reason</label><textarea id="leaveReason"></textarea>
+<button class="btn green" onclick="saveLeave()">Save Record</button><button class="btn yellow" onclick="generateLeaveForm(false)">Generate Filled Form</button><button class="btn secondary" onclick="generateLeaveForm(true)">Generate Blank Form</button><button class="btn" onclick="printOnly('leave')">Print / Save PDF</button>
+</div></div><div id="leavePrint" class="print-area"></div></section>
+
+
+<section id="exception" class="page hidden">
+<div class="card no-print"><h2>Attendance Exception Record</h2><div class="card-body">
+<p class="note">Record only exceptions such as absent, late, half-day, early leave or no-show. No need to record daily attendance.</p>
+<div class="grid3">
+<div><label>Select Employee</label><select id="exEmployee"></select></div>
+<div><label>Date</label><input id="exDate" type="date"></div>
+<div><label>Exception Type</label><select id="exType"><option>Absent</option><option>Late</option><option>Half Day</option><option>Early Leave</option><option>No Show</option><option>Medical Leave / MC</option><option>Unpaid Leave</option><option>Work From Home</option><option>Others</option></select></div>
+<div><label>Salary Impact</label><select id="exImpact"><option>No Deduction</option><option>Half-day Deduction</option><option>Full-day Deduction</option><option>Manual Deduction</option></select></div>
+<div><label>Deduction Amount (RM)</label><input id="exDeduction" type="number" value="0"></div>
+<div><label>Status</label><select id="exStatus"><option>Pending Approval</option><option>Approved</option><option>Rejected</option></select></div>
+<div><label>Approved By</label><input id="exApprovedBy"></div>
+</div>
+<label>Reason / Remarks</label><textarea id="exReason"></textarea>
+<button class="btn green" onclick="saveException()">Save Exception</button>
+<button class="btn yellow" onclick="generateExceptionForm(false)">Generate Filled Form</button>
+<button class="btn secondary" onclick="generateExceptionForm(true)">Generate Blank Form</button>
+<button class="btn" onclick="printOnly('exception')">Print / Save PDF</button>
+</div></div><div id="exceptionPrint" class="print-area"></div></section>
+
+<section id="assets" class="page hidden">
+<div class="card no-print"><h2>Asset & Equipment Issue</h2><div class="card-body">
+<div class="grid3">
+<div><label>Select Employee</label><select id="assetEmployee"></select></div>
+<div><label>Issue Date</label><input id="assetIssueDate" type="date"></div>
+<div><label>Asset Type</label><select id="assetType"><option>Company Uniform</option><option>Safety Vest</option><option>Safety Shoes</option><option>Company Phone</option><option>Company SIM</option><option>Laptop</option><option>Vehicle Key</option><option>Fuel Card</option><option>Touch 'n Go Card</option><option>Warehouse Key</option><option>Office Key</option><option>Tools</option><option>Others</option></select></div>
+<div><label>Asset Description</label><input id="assetDesc"></div>
+<div><label>Serial / Card / Plate No.</label><input id="assetSerial"></div>
+<div><label>Condition</label><select id="assetCondition"><option>New</option><option>Good</option><option>Used</option><option>Damaged</option></select></div>
+<div><label>Status</label><select id="assetStatus"><option>Issued</option><option>Returned</option><option>Lost</option><option>Damaged</option></select></div>
+<div><label>Return Date</label><input id="assetReturnDate" type="date"></div>
+</div>
+<label>Remarks</label><textarea id="assetRemarks"></textarea>
+<button class="btn green" onclick="saveAsset()">Save Asset Record</button>
+<button class="btn yellow" onclick="generateAssetForm(false)">Generate Filled Form</button>
+<button class="btn secondary" onclick="generateAssetForm(true)">Generate Blank Form</button>
+<button class="btn" onclick="printOnly('assets')">Print / Save PDF</button>
+</div></div><div id="assetPrint" class="print-area"></div></section>
+
+<section id="vehicles" class="page hidden">
+<div class="card no-print"><h2>Vehicle Assignment</h2><div class="card-body">
+<div class="grid3">
+<div><label>Select Driver / Employee</label><select id="vehEmployee"></select></div>
+<div><label>Assignment Date</label><input id="vehDate" type="date"></div>
+<div><label>Vehicle Plate No.</label><input id="vehPlate"></div>
+<div><label>Vehicle Type</label><input id="vehType" placeholder="e.g. Lorry / Van / Pickup"></div>
+<div><label>Fuel Card No.</label><input id="vehFuelCard"></div>
+<div><label>Touch 'n Go Card No.</label><input id="vehTng"></div>
+<div><label>Start Mileage</label><input id="vehMileage" type="number" value="0"></div>
+<div><label>Status</label><select id="vehStatus"><option>Assigned</option><option>Returned</option><option>Temporary</option></select></div>
+</div>
+<label>Remarks</label><textarea id="vehRemarks"></textarea>
+<button class="btn green" onclick="saveVehicle()">Save Vehicle Assignment</button>
+<button class="btn yellow" onclick="generateVehicleForm(false)">Generate Filled Form</button>
+<button class="btn secondary" onclick="generateVehicleForm(true)">Generate Blank Form</button>
+<button class="btn" onclick="printOnly('vehicles')">Print / Save PDF</button>
+</div></div><div id="vehiclePrint" class="print-area"></div></section>
+
+
+<section id="expenses" class="page hidden">
+<div class="card no-print"><h2>Expense Management</h2><div class="card-body">
+<p class="note">Use this module for staff pay-and-claim, entertainment, staff welfare/engagement, travel, purchases and other company expenses. Approved claims may be reimbursed together with the employee's salary for the same month, while remaining separate from statutory wages and deductions.</p>
+<div class="grid3">
+<div><label>Claim No.</label><input id="claimNo" readonly></div>
+<div><label>Claimant / Employee</label><select id="claimEmployee"></select></div>
+<div><label>Claim Date</label><input id="claimDate" type="date"></div>
+<div><label>Expense Date</label><input id="expenseDate" type="date"></div>
+<div><label>Expense Type</label><select id="claimType" onchange="toggleClaimFields()"><option>Travel</option><option>Entertainment</option><option>Staff Welfare / Engagement</option><option>Office Purchase</option><option>Business Purchase</option><option>Marketing</option><option>Vehicle</option><option>Training</option><option>Utilities / Operations</option><option>Others</option></select></div>
+<div><label>Category / Item</label><input id="claimCategory" placeholder="e.g. Parking, team lunch, stationery"></div>
+<div><label>Customer / Supplier (Optional)</label><input id="claimCustomer"></div>
+<div><label>Project / Job (Optional)</label><input id="claimProject"></div>
+<div><label>Payment Made By</label><select id="claimPaidBy"><option>Cash</option><option>Personal Debit Card</option><option>Personal Credit Card</option><option>DuitNow / Bank Transfer</option><option>E-Wallet</option><option>Others</option></select></div>
+<div><label>Budget Amount (RM)</label><input id="claimBudget" type="number" value="0" oninput="calcClaimVariance()"></div>
+<div><label>Claimed / Actual Amount (RM)</label><input id="claimAmount" type="number" value="0" oninput="calcClaimVariance()"></div>
+<div><label>Variance (RM)</label><input id="claimVariance" type="number" readonly></div>
+<div><label>Budget Status</label><input id="claimBudgetStatus" readonly></div>
+<div><label>Claim Status</label><select id="claimStatus"><option>Draft</option><option>Submitted</option><option>Approved</option><option>Rejected</option><option>Paid</option><option>Closed</option></select></div>
+<div><label>Approved By</label><input id="claimApprovedBy"></div>
+<div><label>Payment Date</label><input id="claimPaymentDate" type="date"></div>
+<div><label>Reimbursement Method</label><select id="claimReimburseMethod"><option>Bank Transfer</option><option>Cash</option><option>DuitNow</option><option>Not Applicable</option></select></div>
+</div>
+<div id="staffActivityFields" class="card" style="box-shadow:none;margin-top:12px;display:none"><h2 style="font-size:15px">Staff Welfare / Engagement Details</h2><div class="card-body"><div class="grid3">
+<div><label>Activity Name</label><input id="activityName" placeholder="e.g. Team Lunch / Birthday Celebration"></div>
+<div><label>Activity Date</label><input id="activityDate" type="date"></div>
+<div><label>Venue</label><input id="activityVenue"></div>
+<div><label>Organizer</label><input id="activityOrganizer"></div>
+<div><label>No. of Participants</label><input id="activityParticipants" type="number" value="0"></div>
+<div><label>Participants / Staff Names</label><input id="activityNames" placeholder="Separate names with commas"></div>
+</div></div></div>
+<label>Description / Business Purpose</label><textarea id="claimDescription"></textarea>
+<div class="grid2">
+<div><label>Receipt / Supporting Document</label><input id="claimReceipt" type="file" accept="image/*,.pdf"></div>
+<div><label>Receipt Remarks</label><input id="claimReceiptRemarks"></div>
+</div>
+<button class="btn yellow" onclick="newClaim()">New Claim</button>
+<button class="btn green" onclick="saveClaim()">Save Claim</button>
+<button class="btn yellow" onclick="generateClaimForm(false)">Generate Filled Form</button>
+<button class="btn secondary" onclick="generateClaimForm(true)">Generate Blank Form</button>
+<button class="btn" onclick="printOnly('expenses')">Print / Save PDF</button>
+</div></div>
+<div class="card"><h2>Claims & Reimbursement Register</h2><div class="card-body"><table class="table" id="claimRegisterTable"></table></div></div>
+<div id="claimPrint" class="print-area"></div>
+</section>
+
+<section id="blankforms" class="page hidden"><div class="card"><h2>Blank Forms</h2><div class="card-body">
+<button class="btn yellow" onclick="showPage('advance');generateAdvanceForm(true);printOnly('advance')">Print Blank Salary Advance Form</button>
+<button class="btn yellow" onclick="showPage('leave');generateLeaveForm(true);printOnly('leave')">Print Blank Leave Form</button>
+<button class="btn yellow" onclick="showPage('outstation');generateOutstationForm(true);printOnly('outstation')">Print Blank Outstation Form</button>
+<button class="btn yellow" onclick="showPage('exception');generateExceptionForm(true);printOnly('exception')">Print Blank Attendance Exception Form</button>
+<button class="btn yellow" onclick="showPage('assets');generateAssetForm(true);printOnly('assets')">Print Blank Asset Issue Form</button>
+<button class="btn yellow" onclick="showPage('vehicles');generateVehicleForm(true);printOnly('vehicles')">Print Blank Vehicle Assignment Form</button>
+<button class="btn yellow" onclick="showPage('expenses');generateClaimForm(true);printOnly('expenses')">Print Blank Expense Claim Form</button>
+<button class="btn secondary" onclick="showPage('payroll');generatePayslip(true);printOnly('payroll')">Print Blank Payslip</button>
+</div></div></section>
+
+<section id="reports" class="page hidden"><div class="card"><h2>Reports</h2><div class="card-body"><h3>Salary Advance Records</h3><table class="table" id="advanceTable"></table><h3>Leave Records</h3><table class="table" id="leaveTable"></table><h3>Outstation Allowance Records</h3><table class="table" id="outstationTable"></table><h3>Attendance Exception Records</h3><table class="table" id="exceptionTable"></table><h3>Asset Records</h3><table class="table" id="assetTable"></table><h3>Vehicle Assignment Records</h3><table class="table" id="vehicleTable"></table><h3>Expense & Claim Records</h3><table class="table" id="expenseTable"></table></div></div></section>
+<section id="settings" class="page hidden"><div class="card"><h2>Company Settings</h2><div class="card-body"><div class="grid2"><div><label>Company Name</label><input id="setCompanyName"></div><div><label>Company Registration No.</label><input id="setCompanyNo"></div><div><label>Telephone</label><input id="setTel"></div><div><label>Email</label><input id="setEmail"></div><div style="grid-column:1/-1"><label>Address</label><textarea id="setAddress"></textarea></div>
+<div><label>Working Hours (Mon–Fri)</label><input id="setWeekdayHours" value="Monday to Friday, 8:00 AM – 5:00 PM"></div>
+<div><label>Working Hours (Saturday)</label><input id="setSaturdayHours" value="Saturday, 8:00 AM – 1:00 PM"></div>
+<div><label>Rest Day</label><input id="setRestDay" value="Sunday"></div>
+<div><label>Public Holiday Policy</label><input id="setPublicHoliday" value="Malaysia gazetted public holidays applicable in Sabah"></div>
+<div><label>Default Probation Period</label><input id="setProbation" value="3 months"></div>
+<div><label>Default Notice Period</label><input id="setNotice" value="1 month"></div>
+<div><label>Salary Payment Day</label><input id="setSalaryPayment" value="On or before the 7th day of the following month"></div><div><label>Outstation Allowance Rate</label><input id="setOutstationRate" type="number" value="70"></div><div><label>Employer EPF No.</label><input id="setEmployerEpf"></div><div><label>Employer PERKESO No.</label><input id="setEmployerSocso"></div><div><label>Employer LHDN No.</label><input id="setEmployerTax"></div></div><button class="btn green" onclick="saveSettings()">Save Settings</button></div></div></section>
+</main></div>
+
+
+<div id="backupManagerModal" class="backup-modal no-print" role="dialog" aria-modal="true" aria-labelledby="backupManagerTitle">
+  <div class="backup-dialog">
+    <h3 id="backupManagerTitle">GME HRMS Backup Manager</h3>
+    <div class="content">
+      <div id="backupManagerStatus" class="backup-status warn">Checking backup status…</div>
+      <div class="backup-grid">
+        <div class="backup-info"><small>Automatic Save</small><b id="bmAutoSave">Active</b></div>
+        <div class="backup-info"><small>Unsaved Changes Since Backup</small><b id="bmDirty">No</b></div>
+        <div class="backup-info"><small>Last JSON Backup</small><b id="bmLastBackup">Never</b></div>
+        <div class="backup-info"><small>Database Size</small><b id="bmDbSize">0 KB</b></div>
+        <div class="backup-info"><small>System Version</small><b id="bmVersion">v3.1.5</b></div>
+        <div class="backup-info"><small>Storage Location</small><b>Current browser only</b></div>
+      </div>
+      <h4 style="margin:15px 0 6px">Recent Backup History</h4>
+      <table class="backup-history" id="backupHistoryTable"></table>
+      <p class="note" style="margin-bottom:0">“Backup Now” downloads a JSON file containing your company settings, employees, forms and records. Keep the file in a safe folder or cloud drive.</p>
+    </div>
+    <div class="actions">
+      <button class="btn yellow" onclick="backupNowFromManager()">Backup Now</button>
+      <button class="btn secondary" onclick="document.getElementById('importFile').click()">Restore JSON</button>
+      <button class="btn red" onclick="safeExitFromManager()">Exit System</button>
+      <button class="btn secondary" onclick="closeBackupManager()">Continue Working</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const defaultData={settings:{companyName:'GME MARKETING',companyNo:'0000200330T',tel:'019-871 9868',email:'gme.sbkk@gmail.com',address:'G-G-60, Lorong Inanam Kapital 5, Inanam Kapital,\\nJalan Nountun, Inanam, 88450 Kota Kinabalu, Sabah',weekdayHours:'Monday to Friday, 8:00 AM – 5:00 PM',saturdayHours:'Saturday, 8:00 AM – 1:00 PM',restDay:'Sunday',publicHoliday:'Malaysia gazetted public holidays applicable in Sabah',probation:'3 months',notice:'1 month',salaryPayment:'On or before the 7th day of the following month',outstationRate:70},employees:[{id:'EMP001',name:'Kwan Khar Lien',ic:'810302-12-5349',position:'General Manager',department:'',bank:'Hong Leong 28651215655',salary:2000,allowance:1000,epf:'',socso:'',tax:'',annualEntitlement:8,sickEntitlement:14,documents:[],status:'Active'},{id:'EMP002',name:'Sabri Bin Aris',ic:'920925-12-5123',position:'Store Supervisor',department:'',bank:'Public Bank 6822704228',salary:2000,allowance:0,epf:'',socso:'',tax:'',annualEntitlement:8,sickEntitlement:14,documents:[],status:'Active'},{id:'EMP003',name:'John Abed Amran @ Alfred',ic:'020308-12-0069',position:'Lorry Driver',department:'',bank:'',salary:2300,allowance:0,epf:'',socso:'',tax:'',annualEntitlement:8,sickEntitlement:14,documents:[],status:'Active'}],advances:[],leaves:[],outstations:[],exceptions:[],assets:[],vehicles:[],claims:[]}
+let db=JSON.parse(localStorage.getItem('gmeHRMSv2')||'null')||defaultData, selectedEmpId='';
+function migrateDB(){db.settings=db.settings||defaultData.settings; db.settings.weekdayHours='Monday to Friday, 8:00 AM – 5:00 PM'; db.settings.saturdayHours='Saturday, 8:00 AM – 1:00 PM'; db.settings.restDay='Sunday'; db.settings.publicHoliday='Malaysia gazetted public holidays applicable in Sabah'; db.employees=db.employees||[]; db.advances=db.advances||[]; db.leaves=db.leaves||[]; db.outstations=db.outstations||[]; db.exceptions=db.exceptions||[]; db.assets=db.assets||[]; db.vehicles=db.vehicles||[]; db.claims=db.claims||[]; db.version='3.1.5';}
+migrateDB();
+function saveDB(){localStorage.setItem('gmeHRMSv2',JSON.stringify(db));markBackupDirty();refreshAll()}function today(){return new Date().toISOString().slice(0,10)}function monthNow(){let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}function money(v){return Number(v||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2})}function num(id){return Number(document.getElementById(id)?.value||0)}function emp(id){return db.employees.find(e=>e.id===id)||{}}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active')}
+function nextEmpId(){let max=0;db.employees.forEach(e=>{let m=e.id.match(/(\\d+)/);if(m)max=Math.max(max,+m[1])});return 'EMP'+String(max+1).padStart(3,'0')}
+function refreshAll(){refreshEmployees();refreshSelects();refreshReports();statEmployees.textContent=db.employees.filter(e=>e.status==='Active').length;statAdvances.textContent=db.advances.length;statLeaves.textContent=db.leaves.length;if(document.getElementById('statOutstations'))statOutstations.textContent=(db.outstations||[]).length; if(document.getElementById('statExceptions'))statExceptions.textContent=(db.exceptions||[]).length; if(document.getElementById('statAssets'))statAssets.textContent=(db.assets||[]).filter(a=>a.status==='Issued').length; if(document.getElementById('statVehicles'))statVehicles.textContent=(db.vehicles||[]).filter(v=>v.status==='Assigned').length; if(document.getElementById('statPendingClaims'))statPendingClaims.textContent=(db.claims||[]).filter(c=>['Submitted','Approved'].includes(c.status)).length; if(document.getElementById('statClaimTotal')){let m=monthNow();let total=(db.claims||[]).filter(c=>(c.expenseDate||'').startsWith(m)).reduce((a,c)=>a+Number(c.amount||0),0);statClaimTotal.textContent='RM '+money(total)} if(document.getElementById('statActivities'))statActivities.textContent=(db.claims||[]).filter(c=>c.type==='Staff Welfare / Engagement').length}
+function refreshEmployees(){employeeTable.innerHTML='<tr><th>ID</th><th>Name</th><th>Position</th><th>Salary</th><th>Status</th><th>Action</th></tr>'+db.employees.map(e=>`<tr><td>${e.id}</td><td>${e.name}</td><td>${e.position||''}</td><td>RM ${money(e.salary)}</td><td>${e.status}</td><td><button class="btn secondary" onclick="editEmployee('${e.id}')">Edit</button></td></tr>`).join('')}
+function refreshSelects(){['payEmployee','advEmployee','leaveEmployee','contractEmployee','outEmployee','exEmployee','assetEmployee','vehEmployee','claimEmployee'].forEach(id=>{let s=document.getElementById(id);if(!s)return;s.innerHTML='<option value="">-- Select Employee --</option>'+db.employees.filter(e=>e.status==='Active').map(e=>`<option value="${e.id}">${e.id} - ${e.name}</option>`).join('')})}
+function newEmployee(){selectedEmpId='';empName.value='';empId.value=nextEmpId();empIc.value='';empPosition.value='';empDepartment.value='';empBank.value='';empEpf.value='';empSocso.value='';empTax.value='';empSalary.value=2000;empAllowance.value=0;empAnnualEntitlement.value=8;empSickEntitlement.value=14;empStatus.value='Active';refreshDocuments()}
+function editEmployee(id){let e=emp(id);selectedEmpId=id;empName.value=e.name;empId.value=e.id;empIc.value=e.ic||'';empPosition.value=e.position||'';empDepartment.value=e.department||'';empBank.value=e.bank||'';empEpf.value=e.epf||'';empSocso.value=e.socso||'';empTax.value=e.tax||'';empSalary.value=e.salary||0;empAllowance.value=e.allowance||0;empAnnualEntitlement.value=e.annualEntitlement||8;empSickEntitlement.value=e.sickEntitlement||14;empStatus.value=e.status||'Active';refreshDocuments();showPage('employees')}
+function saveEmployee(){let e={id:empId.value||nextEmpId(),name:empName.value,ic:empIc.value,position:empPosition.value,department:empDepartment.value,bank:empBank.value,epf:empEpf.value,socso:empSocso.value,tax:empTax.value,salary:num('empSalary'),allowance:num('empAllowance'),annualEntitlement:num('empAnnualEntitlement'),sickEntitlement:num('empSickEntitlement'),documents:(emp(empId.value).documents||[]),status:empStatus.value};if(!e.name){alert('Enter employee name');return}let i=db.employees.findIndex(x=>x.id===e.id);i>=0?db.employees[i]=e:db.employees.push(e);saveDB();alert('Employee saved')}
+function deleteEmployee(){if(!empId.value)return;if(confirm('Delete employee?')){db.employees=db.employees.filter(e=>e.id!==empId.value);saveDB();newEmployee()}}
+function header(title){let s=db.settings;return `<div class="a4-header"><div class="a4-company"><h1>${s.companyName}</h1><p><b>Company Registration No.:</b> ${s.companyNo}</p><p>${s.address.replace(/\\n/g,'<br>')}</p><p><b>Tel:</b> ${s.tel} &nbsp; | &nbsp; <b>Email:</b> ${s.email}</p></div><div class="a4-title">${title}</div></div>`}
+function row(l,v=''){return `<div class="frow"><div class="flabel">${l}</div><div class="fval"><div class="line">${v||''}</div></div></div>`}function tr(l,v){return `<tr><td>${l}</td><td class="right">${money(v)}</td></tr>`}
+function socsoEmp(s){if(s<=2000)return 9.75;if(s<=2100)return 10.25;if(s<=2200)return 10.75;if(s<=2300)return 11.25;if(s<=2400)return 11.75;if(s<=2500)return 12.25;return Math.min(24.75,Math.ceil(s/100)*.5-.25)}function socsoEr(s){if(s<=2000)return 34.15;if(s<=2100)return 35.85;if(s<=2200)return 37.55;if(s<=2300)return 39.25;if(s<=2400)return 40.95;if(s<=2500)return 42.65;return Math.min(86.65,Math.ceil(s/100)*1.7+.15)}function eis(s){if(s<=2000)return 4;if(s<=2100)return 4.2;if(s<=2200)return 4.4;if(s<=2300)return 4.6;if(s<=2400)return 4.8;if(s<=2500)return 5;return Math.min(19.8,Math.round(s*.002*20)/20)}
+function payrollMonthClaims(){
+ const employee=document.getElementById('payEmployee')?.value||'';
+ const month=document.getElementById('payMonth')?.value||'';
+ if(!employee||!month)return [];
+ return (db.claims||[]).filter(c=>c.employee===employee && String(c.expenseDate||'').startsWith(month) && c.status==='Approved');
+}
+function loadPayrollClaims(){
+ const claims=payrollMonthClaims();
+ const total=claims.reduce((sum,c)=>sum+Number(c.amount||0),0);
+ const amountEl=document.getElementById('payClaimsReimbursement');
+ const listEl=document.getElementById('payClaimsList');
+ if(amountEl)amountEl.value=total.toFixed(2);
+ if(listEl)listEl.value=claims.map(c=>`${c.no} (RM ${money(c.amount)})`).join(', ');
+ return claims;
+}
+function loadPayrollEmployee(){let e=emp(payEmployee.value);paySalary.value=e.salary||0;payAllowance.value=e.allowance||0;loadPayrollClaims();generatePayslip()}
+function markPayrollClaimsPaid(){
+ const claims=payrollMonthClaims();
+ if(!claims.length){alert('No approved same-month claims are currently included.');return}
+ const total=claims.reduce((sum,c)=>sum+Number(c.amount||0),0);
+ if(!confirm(`Mark ${claims.length} claim(s), total RM ${money(total)}, as paid with this payroll?`))return;
+ claims.forEach(c=>{c.status='Paid';c.paymentDate=payDate.value||today();c.reimburseMethod='Payroll';c.payrollMonth=payMonth.value;});
+ saveDB();loadPayrollClaims();generatePayslip();alert('Included claims marked as paid via payroll.');
+}
+function generatePayslip(blank=false){
+ let e=blank?{}:emp(payEmployee.value);
+ if(!blank)loadPayrollClaims();
+ let gross=num('paySalary')+num('payAllowance')+num('payOutstationAllowance')+num('payCommission')+num('payBonus'),
+ epf=gross*.11,erEpf=gross<=5000?gross*.13:gross*.12,se=socsoEmp(gross),sr=socsoEr(gross),ei=eis(gross),adv=num('payAdvanceDeduction'),other=num('payOtherDeduction'),ded=epf+se+ei+adv+other,
+ claims=blank?0:num('payClaimsReimbursement'),netSalary=gross-ded,totalPayable=netSalary+claims,claimList=blank?'':(document.getElementById('payClaimsList')?.value||'');
+ payslipPrint.innerHTML=`<div class="a4">${header('SALARY<br>PAYSLIP')}<div class="fx2"><div class="fbox"><div class="fhead">A. EMPLOYEE INFORMATION</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('IC No.',e.ic)}${row('EPF / KWSP No.',e.epf)}${row('SOCSO / PERKESO No.',e.socso)}${row('Position',e.position)}${row('Bank / Account No.',e.bank)}</div><div class="fbox"><div class="fhead">B. PAYSLIP INFORMATION</div>${row('Payroll Month',payMonth.value)}${row('Payment Date',payDate.value)}${row('Payslip No.',e.id?'PS-'+payMonth.value.replace('-','')+'-'+e.id:'')}${row('Payment Method','Bank Transfer')}</div></div><div class="payslip-grid"><div><table class="ptable"><tr><th>Earnings</th><th class="right">Amount (RM)</th></tr>${tr('Basic Salary',num('paySalary'))}${tr('Fixed Allowance',num('payAllowance'))}${tr('Outstation Allowance',num('payOutstationAllowance'))}${tr('Commission / OT',num('payCommission'))}${tr('Bonus / Adjustment',num('payBonus'))}<tr class="total"><td>Gross Salary</td><td class="right">${money(gross)}</td></tr></table><table class="ptable"><tr><th>Deductions</th><th class="right">Amount (RM)</th></tr>${tr('Employee EPF',epf)}${tr('Employee SOCSO',se)}${tr('Employee EIS',ei)}${tr('Salary Advance Deduction',adv)}${tr('Other Deduction',other)}<tr class="total"><td>Total Deduction</td><td class="right">${money(ded)}</td></tr></table><div class="net"><div>Net Salary</div><div class="amt">RM ${money(netSalary)}</div></div><table class="ptable" style="margin-top:4mm"><tr><th>Non-Salary Reimbursement</th><th class="right">Amount (RM)</th></tr>${tr('Approved Claims Reimbursement',claims)}<tr class="total"><td>Total Amount Payable</td><td class="right">${money(totalPayable)}</td></tr></table></div><div><table class="ptable"><tr><th>Employer Contribution</th><th class="right">Amount (RM)</th></tr>${tr('Employer EPF',erEpf)}${tr('Employer SOCSO',sr)}${tr('Employer EIS',ei)}<tr class="total"><td>Total Employer Contribution</td><td class="right">${money(erEpf+sr+ei)}</td></tr><tr class="total"><td>Total Employer Cost (Salary Only)</td><td class="right">${money(gross+erEpf+sr+ei)}</td></tr><tr class="total"><td>Total Cash Outflow incl. Claims</td><td class="right">${money(gross+erEpf+sr+ei+claims)}</td></tr></table><div class="fbox"><div class="fhead">Claims Included</div><div style="padding:3mm;font-size:8.5pt;min-height:12mm">${claimList||'None'}</div></div><div class="fbox"><div class="fhead">Notes</div><div style="padding:3mm;font-size:8.5pt">Claims reimbursement is shown separately from salary and is not included in EPF, SOCSO or EIS calculations. This is a computer-generated payslip.</div></div></div></div><div class="signature"><div class="sig">Prepared By</div><div class="sig">Checked By</div><div class="sig">Employee Acknowledgement</div></div><div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`
+}
+function checkAdvanceRule(){let d=advPaymentDate.value||advRequestDate.value;advCaseType.value=d?(Number(d.split('-')[2])===20?'Normal Case - 20th of the month':'Exceptional Case - approval required'):''}
+function generateAdvanceForm(blank=false){let e=blank?{}:emp(advEmployee.value);advancePrint.innerHTML=`<div class="a4">${header('SALARY<br>ADVANCE<br>FORM')}<div class="rule"><b>Default Salary Advance Rule:</b><ol><li>Salary advance is normally allowed only on the <b>20th of every month</b>.</li><li>Any request outside the 20th is an exceptional case and requires approval.</li><li>Only one active salary advance is allowed unless approved by management.</li></ol></div><div class="fx2"><div class="fbox"><div class="fhead">A. EMPLOYEE INFORMATION</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('Position',e.position)}${row('Department',e.department)}</div><div class="fbox"><div class="fhead">B. REQUEST INFORMATION</div>${row('Request Date',blank?'':advRequestDate.value)}${row('Payment Date',blank?'':advPaymentDate.value)}${row('Requested Amount (RM)',blank?'':advAmount.value)}${row('Case Type',blank?'':advCaseType.value)}</div></div><div class="fbox"><div class="fhead">C. REASON / PURPOSE</div><table class="check-table"><tr><td><span class="boxchk"></span>Medical / Emergency</td><td><span class="boxchk"></span>Family Commitment</td></tr><tr><td><span class="boxchk"></span>Transportation</td><td><span class="boxchk"></span>Education</td></tr><tr><td><span class="boxchk"></span>Personal Commitment</td><td><span class="boxchk"></span>Others</td></tr></table><div class="reason-lines"><div class="label-line"><span>Details</span><span><div class="multi-line">${blank?'':advReason.value}</div><div class="multi-line"></div></span></div></div></div><div class="fx2"><div class="fbox"><div class="fhead">D. REPAYMENT METHOD</div>${row('Deduct From Salary Month',blank?'':advDeductMonth.value)}${row('Monthly Deduction (RM)',blank?'':advMonthlyDeduction.value)}</div><div class="fbox"><div class="fhead">E. APPROVAL</div>${row('Status',blank?'':advStatus.value)}${row('Approved By',blank?'':advApprovedBy.value)}${row('Approval Date','')}</div></div><div class="signature"><div class="sig">Requested By</div><div class="sig">Checked By</div><div class="sig">Approved By</div></div><div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`}
+function saveAdvance(){db.advances.push({employee:advEmployee.value,date:advRequestDate.value,amount:num('advAmount'),status:advStatus.value,type:advCaseType.value});saveDB();alert('Advance record saved')}
+function calcLeaveDays(){if(!leaveStart.value||!leaveEnd.value)return;leaveDays.value=Math.max(0,Math.round((new Date(leaveEnd.value)-new Date(leaveStart.value))/86400000)+1)}
+function leaveType(){return document.querySelector('input[name="leaveType"]:checked')?.value||'Annual Leave'}
+function generateLeaveForm(blank=false){
+let e=blank?{}:emp(leaveEmployee.value),chosen=blank?'':leaveType();
+const chk=(t)=>chosen===t?'&#10003;':'';
+leavePrint.innerHTML=`<div class="a4">
+${header('LEAVE<br>APPLICATION<br>FORM')}
+
+<div class="fx2">
+<div class="fbox">
+<div class="fhead">EMPLOYEE INFORMATION</div>
+${row('Employee Name',e.name)}
+${row('Employee ID',e.id)}
+${row('Position',e.position)}
+${row('Department',e.department)}
+${row('Application Date',blank?'':leaveApplyDate.value)}
+</div>
+
+<div class="fbox">
+<div class="fhead">LEAVE DETAILS</div>
+
+<div style="padding:3mm">
+<b style="font-size:9pt">Leave Type (Tick One)</b>
+<table class="check-table" style="margin-top:2mm">
+<tr>
+<td><span class="boxchk">`+chk('Annual Leave')+`</span>Annual Leave</td>
+<td><span class="boxchk">`+chk('Sick Leave')+`</span>Sick Leave</td>
+</tr>
+<tr>
+<td><span class="boxchk">`+chk('Emergency Leave')+`</span>Emergency Leave</td>
+<td><span class="boxchk">`+chk('Unpaid Leave')+`</span>Unpaid Leave</td>
+</tr>
+<tr>
+<td><span class="boxchk">`+chk('Compassionate Leave')+`</span>Compassionate Leave</td>
+<td><span class="boxchk">`+chk('Others')+`</span>Others</td>
+</tr>
+</table>
+</div>
+
+${row('From',blank?'':leaveStart.value)}
+${row('To',blank?'':leaveEnd.value)}
+${row('Total Days',blank?'':leaveDays.value)}
+</div>
+</div>
+
+<div class="fbox">
+<div class="fhead">REASON</div>
+<div style="padding:4mm">
+<div class="multi-line">`+(blank?'':leaveReason.value)+`</div>
+<div class="multi-line"></div>
+<div class="multi-line"></div>
+</div>
+</div>
+
+<div class="fx2">
+<div class="fbox">
+<div class="fhead">LEAVE BALANCE</div>
+${row('Annual Leave Balance',blank?'':leaveBalance.value+' day(s)')}
+</div>
+
+<div class="fbox">
+<div class="fhead">APPROVAL</div>
+${row('Status',blank?'':leaveStatus.value)}
+${row('Approved By',blank?'':leaveApprovedBy.value)}
+${row('Remarks','')}
+</div>
+</div>
+
+<div class="signature" style="grid-template-columns:1fr 1fr">
+<div class="sig">Employee Signature</div>
+<div class="sig">Manager Approval</div>
+</div>
+
+<div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div>
+</div>`;
+}
+function saveLeave(){db.leaves.push({employee:leaveEmployee.value,type:leaveType(),start:leaveStart.value,end:leaveEnd.value,days:num('leaveDays'),status:leaveStatus.value});saveDB();alert('Leave record saved')}
+
+function refreshDocuments(){
+ const t=document.getElementById('documentTable'); if(!t)return;
+ const id=empId.value; const e=emp(id); const docs=e.documents||[];
+ t.innerHTML='<tr><th>Type</th><th>File Name</th><th>Remarks</th><th>Action</th></tr>'+docs.map((d,i)=>`<tr><td>${d.type}</td><td>${d.name}</td><td>${d.remarks||''}</td><td><button class="btn secondary" onclick="downloadEmployeeDocument('${id}',${i})">Open</button><button class="btn red" onclick="deleteEmployeeDocument('${id}',${i})">Delete</button></td></tr>`).join('');
+}
+function addEmployeeDocument(){
+ const id=empId.value; if(!id){alert('Please select or save employee first.');return}
+ const e=emp(id); if(!e.id){alert('Employee not found. Please save employee first.');return}
+ const file=document.getElementById('docFile').files[0]; if(!file){alert('Please choose a document file.');return}
+ const reader=new FileReader();
+ reader.onload=function(){
+   e.documents=e.documents||[];
+   e.documents.push({type:docType.value,name:file.name,remarks:docRemarks.value,data:reader.result});
+   saveDB(); docFile.value=''; docRemarks.value=''; refreshDocuments(); alert('Document added.');
+ };
+ reader.readAsDataURL(file);
+}
+function downloadEmployeeDocument(id,index){
+ const e=emp(id); const d=(e.documents||[])[index]; if(!d)return;
+ const a=document.createElement('a'); a.href=d.data; a.download=d.name; a.target='_blank'; a.click();
+}
+function deleteEmployeeDocument(id,index){
+ const e=emp(id); if(!e.documents)return;
+ if(confirm('Delete this document?')){e.documents.splice(index,1);saveDB();refreshDocuments();}
+}
+
+
+function calcOutstation(){
+ const s=document.getElementById('outStart')?.value, e=document.getElementById('outEnd')?.value;
+ if(s && e){
+   const days=Math.max(1,Math.round((new Date(e)-new Date(s))/86400000)+1);
+   outDays.value=days;
+ }
+ const manual=outManualAmount.value;
+ const total=manual!=='' ? Number(manual||0) : Number(outDays.value||0)*Number(outRate.value||db.settings.outstationRate||70);
+ outTotal.value=total.toFixed(2);
+}
+function saveOutstation(){
+ if(!outEmployee.value){alert('Please select employee.');return}
+ calcOutstation();
+ db.outstations=db.outstations||[];
+ db.outstations.push({employee:outEmployee.value,start:outStart.value,end:outEnd.value,days:Number(outDays.value||0),rate:Number(outRate.value||0),manual:outManualAmount.value,total:Number(outTotal.value||0),location:outLocation.value,purpose:outPurpose.value,status:outStatus.value});
+ saveDB();alert('Outstation record saved.');
+}
+function generateOutstationForm(blank=false){
+ let e=blank?{}:emp(outEmployee.value);
+ calcOutstation();
+ outstationPrint.innerHTML=`<div class="a4">${header('OUTSTATION<br>ALLOWANCE<br>FORM')}
+<div class="rule"><b>Outstation Allowance Rule:</b><ol><li>Default allowance is <b>RM${money(db.settings.outstationRate||70)} per outstation day</b>.</li><li>Manual amount may be entered for exceptional cases with management approval.</li><li>Record must include date, location/customer, purpose, and approval status.</li></ol></div>
+<div class="fx2"><div class="fbox"><div class="fhead">A. EMPLOYEE INFORMATION</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('Position',e.position)}${row('Department',e.department)}</div>
+<div class="fbox"><div class="fhead">B. OUTSTATION DETAILS</div>${row('Start Date',blank?'':outStart.value)}${row('End Date',blank?'':outEnd.value)}${row('No. of Days',blank?'':outDays.value)}${row('Location / Customer',blank?'':outLocation.value)}</div></div>
+<div class="fx2"><div class="fbox"><div class="fhead">C. ALLOWANCE CALCULATION</div>${row('Rate / Day',blank?'':'RM '+money(outRate.value||db.settings.outstationRate||70))}${row('Auto Amount',blank?'':'RM '+money(Number(outDays.value||0)*Number(outRate.value||0)))}${row('Manual Amount',blank?'':(outManualAmount.value?'RM '+money(outManualAmount.value):''))}${row('Total Payable',blank?'':'RM '+money(outTotal.value))}</div>
+<div class="fbox"><div class="fhead">D. APPROVAL</div>${row('Status',blank?'':outStatus.value)}${row('Approved By','')}${row('Payment Month','')}</div></div>
+<div class="fbox"><div class="fhead">E. PURPOSE / REMARKS</div><div style="padding:4mm"><div class="multi-line">${blank?'':outPurpose.value}</div><div class="multi-line"></div></div></div>
+<div class="signature"><div class="sig">Requested By</div><div class="sig">Checked By</div><div class="sig">Approved By</div></div>
+<div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`;
+}
+
+
+function saveException(){
+ if(!exEmployee.value){alert('Please select employee.');return}
+ db.exceptions=db.exceptions||[];
+ db.exceptions.push({employee:exEmployee.value,date:exDate.value,type:exType.value,impact:exImpact.value,deduction:Number(exDeduction.value||0),status:exStatus.value,approvedBy:exApprovedBy.value,reason:exReason.value});
+ saveDB();alert('Attendance exception saved.');
+}
+function generateExceptionForm(blank=false){
+ let e=blank?{}:emp(exEmployee.value);
+ exceptionPrint.innerHTML=`<div class="a4">${header('ATTENDANCE<br>EXCEPTION<br>FORM')}
+ <div class="rule"><b>Purpose:</b> This form records attendance exceptions only. Daily attendance is not required.</div>
+ <div class="fx2"><div class="fbox"><div class="fhead">A. EMPLOYEE INFORMATION</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('Position',e.position)}${row('Department',e.department)}</div>
+ <div class="fbox"><div class="fhead">B. EXCEPTION DETAILS</div>${row('Date',blank?'':exDate.value)}${row('Type',blank?'':exType.value)}${row('Salary Impact',blank?'':exImpact.value)}${row('Deduction Amount',blank?'':'RM '+money(exDeduction.value))}</div></div>
+ <div class="fbox"><div class="fhead">C. REASON / REMARKS</div><div style="padding:4mm"><div class="multi-line">${blank?'':exReason.value}</div><div class="multi-line"></div></div></div>
+ <div class="fbox"><div class="fhead">D. APPROVAL</div>${row('Status',blank?'':exStatus.value)}${row('Approved By',blank?'':exApprovedBy.value)}${row('Approval Date','')}</div>
+ <div class="signature"><div class="sig">Employee</div><div class="sig">Checked By</div><div class="sig">Approved By</div></div><div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`;
+}
+function saveAsset(){
+ if(!assetEmployee.value){alert('Please select employee.');return}
+ db.assets=db.assets||[];
+ db.assets.push({employee:assetEmployee.value,issueDate:assetIssueDate.value,type:assetType.value,desc:assetDesc.value,serial:assetSerial.value,condition:assetCondition.value,status:assetStatus.value,returnDate:assetReturnDate.value,remarks:assetRemarks.value});
+ saveDB();alert('Asset record saved.');
+}
+function generateAssetForm(blank=false){
+ let e=blank?{}:emp(assetEmployee.value);
+ assetPrint.innerHTML=`<div class="a4">${header('ASSET / EQUIPMENT<br>ISSUE FORM')}
+ <div class="fx2"><div class="fbox"><div class="fhead">A. EMPLOYEE INFORMATION</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('Position',e.position)}${row('Department',e.department)}</div>
+ <div class="fbox"><div class="fhead">B. ASSET DETAILS</div>${row('Issue Date',blank?'':assetIssueDate.value)}${row('Asset Type',blank?'':assetType.value)}${row('Description',blank?'':assetDesc.value)}${row('Serial / Card No.',blank?'':assetSerial.value)}${row('Condition',blank?'':assetCondition.value)}${row('Status',blank?'':assetStatus.value)}${row('Return Date',blank?'':assetReturnDate.value)}</div></div>
+ <div class="fbox"><div class="fhead">C. ACKNOWLEDGEMENT</div><div style="padding:4mm;font-size:9pt">The employee acknowledges receipt of the above company asset/equipment and agrees to return it in good condition upon request or upon leaving the Company.</div></div>
+ <div class="fbox"><div class="fhead">D. REMARKS</div><div style="padding:4mm"><div class="multi-line">${blank?'':assetRemarks.value}</div><div class="multi-line"></div></div></div>
+ <div class="signature"><div class="sig">Issued By</div><div class="sig">Received By</div><div class="sig">Returned / Checked By</div></div><div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`;
+}
+function saveVehicle(){
+ if(!vehEmployee.value){alert('Please select employee.');return}
+ db.vehicles=db.vehicles||[];
+ db.vehicles.push({employee:vehEmployee.value,date:vehDate.value,plate:vehPlate.value,type:vehType.value,fuelCard:vehFuelCard.value,tng:vehTng.value,mileage:Number(vehMileage.value||0),status:vehStatus.value,remarks:vehRemarks.value});
+ saveDB();alert('Vehicle assignment saved.');
+}
+function generateVehicleForm(blank=false){
+ let e=blank?{}:emp(vehEmployee.value);
+ vehiclePrint.innerHTML=`<div class="a4">${header('VEHICLE<br>ASSIGNMENT<br>FORM')}
+ <div class="fx2"><div class="fbox"><div class="fhead">A. DRIVER / EMPLOYEE</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('Position',e.position)}${row('Department',e.department)}</div>
+ <div class="fbox"><div class="fhead">B. VEHICLE DETAILS</div>${row('Assignment Date',blank?'':vehDate.value)}${row('Vehicle Plate No.',blank?'':vehPlate.value)}${row('Vehicle Type',blank?'':vehType.value)}${row('Fuel Card No.',blank?'':vehFuelCard.value)}${row('Touch n Go Card No.',blank?'':vehTng.value)}${row('Start Mileage',blank?'':vehMileage.value)}${row('Status',blank?'':vehStatus.value)}</div></div>
+ <div class="fbox"><div class="fhead">C. TERMS</div><div style="padding:4mm;font-size:9pt">The assigned employee is responsible for proper use of the vehicle, cards and keys issued, and must report any accident, loss, damage, summons or maintenance issue immediately.</div></div>
+ <div class="fbox"><div class="fhead">D. REMARKS</div><div style="padding:4mm"><div class="multi-line">${blank?'':vehRemarks.value}</div><div class="multi-line"></div></div></div>
+ <div class="signature"><div class="sig">Issued By</div><div class="sig">Received By</div><div class="sig">Returned / Checked By</div></div><div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`;
+}
+
+
+function nextClaimNo(){let y=new Date().getFullYear(),max=0;(db.claims||[]).forEach(c=>{let m=String(c.no||'').match(/(\d+)$/);if(m)max=Math.max(max,Number(m[1]))});return 'CLM-'+y+'-'+String(max+1).padStart(4,'0')}
+function newClaim(){claimNo.value=nextClaimNo();claimEmployee.value='';claimDate.value=today();expenseDate.value=today();claimType.value='Travel';claimCategory.value='';claimCustomer.value='';claimProject.value='';claimPaidBy.value='Cash';claimBudget.value=0;claimAmount.value=0;claimStatus.value='Draft';claimApprovedBy.value='';claimPaymentDate.value='';claimReimburseMethod.value='Bank Transfer';claimDescription.value='';claimReceipt.value='';claimReceiptRemarks.value='';activityName.value='';activityDate.value=today();activityVenue.value='';activityOrganizer.value='';activityParticipants.value=0;activityNames.value='';calcClaimVariance();toggleClaimFields()}
+function toggleClaimFields(){staffActivityFields.style.display=claimType.value==='Staff Welfare / Engagement'?'block':'none'}
+function calcClaimVariance(){let b=num('claimBudget'),a=num('claimAmount'),v=b-a;claimVariance.value=v.toFixed(2);claimBudgetStatus.value=b<=0?'No Budget Set':(a<=b?'Within Budget':'Over Budget')}
+function claimReceiptData(){return new Promise(resolve=>{let f=claimReceipt.files[0];if(!f)return resolve(null);let r=new FileReader();r.onload=()=>resolve({name:f.name,type:f.type,data:r.result,remarks:claimReceiptRemarks.value});r.onerror=()=>resolve(null);r.readAsDataURL(f)})}
+async function saveClaim(){if(!claimEmployee.value){alert('Please select claimant / employee.');return}if(num('claimAmount')<=0){alert('Please enter claimed amount.');return}calcClaimVariance();let existing=(db.claims||[]).find(c=>c.no===claimNo.value);let receipt=await claimReceiptData();let record={no:claimNo.value||nextClaimNo(),employee:claimEmployee.value,claimDate:claimDate.value,expenseDate:expenseDate.value,type:claimType.value,category:claimCategory.value,customer:claimCustomer.value,project:claimProject.value,paidBy:claimPaidBy.value,budget:num('claimBudget'),amount:num('claimAmount'),variance:num('claimVariance'),budgetStatus:claimBudgetStatus.value,status:claimStatus.value,approvedBy:claimApprovedBy.value,paymentDate:claimPaymentDate.value,reimburseMethod:claimReimburseMethod.value,description:claimDescription.value,activity:{name:activityName.value,date:activityDate.value,venue:activityVenue.value,organizer:activityOrganizer.value,participants:num('activityParticipants'),names:activityNames.value},receipt:receipt||(existing&&existing.receipt)||null};db.claims=db.claims||[];let i=db.claims.findIndex(c=>c.no===record.no);i>=0?db.claims[i]=record:db.claims.push(record);saveDB();claimNo.value=record.no;alert('Expense claim saved.')}
+function editClaim(no){let c=(db.claims||[]).find(x=>x.no===no);if(!c)return;claimNo.value=c.no;claimEmployee.value=c.employee||'';claimDate.value=c.claimDate||'';expenseDate.value=c.expenseDate||'';claimType.value=c.type||'Travel';claimCategory.value=c.category||'';claimCustomer.value=c.customer||'';claimProject.value=c.project||'';claimPaidBy.value=c.paidBy||'Cash';claimBudget.value=c.budget||0;claimAmount.value=c.amount||0;claimStatus.value=c.status||'Draft';claimApprovedBy.value=c.approvedBy||'';claimPaymentDate.value=c.paymentDate||'';claimReimburseMethod.value=c.reimburseMethod||'Bank Transfer';claimDescription.value=c.description||'';claimReceiptRemarks.value=c.receipt?.remarks||'';activityName.value=c.activity?.name||'';activityDate.value=c.activity?.date||'';activityVenue.value=c.activity?.venue||'';activityOrganizer.value=c.activity?.organizer||'';activityParticipants.value=c.activity?.participants||0;activityNames.value=c.activity?.names||'';calcClaimVariance();toggleClaimFields();showPage('expenses')}
+function openClaimReceipt(no){let c=(db.claims||[]).find(x=>x.no===no);if(!c?.receipt?.data){alert('No receipt attached.');return}let a=document.createElement('a');a.href=c.receipt.data;a.download=c.receipt.name||'receipt';a.target='_blank';a.click()}
+function deleteClaim(no){if(confirm('Delete this claim record?')){db.claims=(db.claims||[]).filter(c=>c.no!==no);saveDB();newClaim()}}
+function refreshClaimRegister(){let t=document.getElementById('claimRegisterTable');if(!t)return;t.innerHTML='<tr><th>Claim No.</th><th>Employee</th><th>Date</th><th>Type</th><th>Description</th><th>Budget</th><th>Actual</th><th>Status</th><th>Action</th></tr>'+(db.claims||[]).map(c=>`<tr><td>${c.no||''}</td><td>${emp(c.employee).name||c.employee||''}</td><td>${c.expenseDate||''}</td><td>${c.type||''}</td><td>${c.category||c.description||''}</td><td>RM ${money(c.budget)}</td><td>RM ${money(c.amount)}</td><td>${c.status||''}</td><td><button class="btn secondary" onclick="editClaim('${c.no}')">Edit</button>${c.receipt?`<button class="btn secondary" onclick="openClaimReceipt('${c.no}')">Receipt</button>`:''}<button class="btn red" onclick="deleteClaim('${c.no}')">Delete</button></td></tr>`).join('')}
+function generateClaimForm(blank=false){let c=blank?{}:(db.claims||[]).find(x=>x.no===claimNo.value)||{no:claimNo.value,employee:claimEmployee.value,claimDate:claimDate.value,expenseDate:expenseDate.value,type:claimType.value,category:claimCategory.value,customer:claimCustomer.value,project:claimProject.value,paidBy:claimPaidBy.value,budget:num('claimBudget'),amount:num('claimAmount'),variance:num('claimVariance'),budgetStatus:claimBudgetStatus.value,status:claimStatus.value,approvedBy:claimApprovedBy.value,paymentDate:claimPaymentDate.value,reimburseMethod:claimReimburseMethod.value,description:claimDescription.value,activity:{name:activityName.value,date:activityDate.value,venue:activityVenue.value,organizer:activityOrganizer.value,participants:num('activityParticipants'),names:activityNames.value}};let e=blank?{}:emp(c.employee);let activity=(c.type==='Staff Welfare / Engagement')?`<div class="fbox"><div class="fhead">D. STAFF WELFARE / ENGAGEMENT DETAILS</div>${row('Activity Name',c.activity?.name)}${row('Activity Date',c.activity?.date)}${row('Venue',c.activity?.venue)}${row('Organizer',c.activity?.organizer)}${row('No. of Participants',c.activity?.participants)}${row('Participants',c.activity?.names)}</div>`:'';claimPrint.innerHTML=`<div class="a4">${header('EXPENSE &<br>CLAIM FORM')}<div class="fx2"><div class="fbox"><div class="fhead">A. CLAIMANT INFORMATION</div>${row('Employee Name',e.name)}${row('Employee ID',e.id)}${row('Position',e.position)}${row('Department',e.department)}</div><div class="fbox"><div class="fhead">B. CLAIM INFORMATION</div>${row('Claim No.',blank?'':c.no)}${row('Claim Date',blank?'':c.claimDate)}${row('Expense Date',blank?'':c.expenseDate)}${row('Expense Type',blank?'':c.type)}${row('Category / Item',blank?'':c.category)}${row('Status',blank?'':c.status)}</div></div><div class="fx2"><div class="fbox"><div class="fhead">C. EXPENSE DETAILS</div>${row('Customer / Supplier',blank?'':c.customer)}${row('Project / Job',blank?'':c.project)}${row('Paid By',blank?'':c.paidBy)}${row('Budget Amount',blank?'':'RM '+money(c.budget))}${row('Actual / Claimed',blank?'':'RM '+money(c.amount))}${row('Variance',blank?'':'RM '+money(c.variance))}${row('Budget Status',blank?'':c.budgetStatus)}</div><div class="fbox"><div class="fhead">PAYMENT & APPROVAL</div>${row('Approved By',blank?'':c.approvedBy)}${row('Payment Date',blank?'':c.paymentDate)}${row('Reimbursement Method',blank?'':c.reimburseMethod)}${row('Receipt Attached',blank?'':(c.receipt?'Yes':'No'))}</div></div>${activity}<div class="fbox"><div class="fhead">E. DESCRIPTION / BUSINESS PURPOSE</div><div style="padding:4mm"><div class="multi-line">${blank?'':c.description||''}</div><div class="multi-line"></div></div></div><div class="signature"><div class="sig">Submitted By</div><div class="sig">Checked By</div><div class="sig">Approved By</div></div><div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div></div>`}
+
+function refreshReports(){
+ refreshClaimRegister();
+ advanceTable.innerHTML='<tr><th>Employee</th><th>Date</th><th>Amount</th><th>Type</th><th>Status</th></tr>'+db.advances.map(a=>`<tr><td>${a.employee}</td><td>${a.date}</td><td>RM ${money(a.amount)}</td><td>${a.type}</td><td>${a.status}</td></tr>`).join('');
+ leaveTable.innerHTML='<tr><th>Employee</th><th>Type</th><th>Start</th><th>End</th><th>Days</th><th>Status</th></tr>'+db.leaves.map(l=>`<tr><td>${l.employee}</td><td>${l.type}</td><td>${l.start}</td><td>${l.end}</td><td>${l.days}</td><td>${l.status}</td></tr>`).join('');
+ if(document.getElementById('outstationTable')) outstationTable.innerHTML='<tr><th>Employee</th><th>Start</th><th>End</th><th>Days</th><th>Location</th><th>Total</th><th>Status</th></tr>'+(db.outstations||[]).map(o=>`<tr><td>${o.employee}</td><td>${o.start}</td><td>${o.end}</td><td>${o.days}</td><td>${o.location||''}</td><td>RM ${money(o.total)}</td><td>${o.status}</td></tr>`).join('');
+ if(document.getElementById('exceptionTable')) exceptionTable.innerHTML='<tr><th>Employee</th><th>Date</th><th>Type</th><th>Impact</th><th>Deduction</th><th>Status</th></tr>'+(db.exceptions||[]).map(x=>`<tr><td>${x.employee}</td><td>${x.date}</td><td>${x.type}</td><td>${x.impact}</td><td>RM ${money(x.deduction)}</td><td>${x.status}</td></tr>`).join('');
+ if(document.getElementById('assetTable')) assetTable.innerHTML='<tr><th>Employee</th><th>Issue Date</th><th>Type</th><th>Description</th><th>Serial</th><th>Status</th></tr>'+(db.assets||[]).map(a=>`<tr><td>${a.employee}</td><td>${a.issueDate}</td><td>${a.type}</td><td>${a.desc||''}</td><td>${a.serial||''}</td><td>${a.status}</td></tr>`).join('');
+ if(document.getElementById('vehicleTable')) vehicleTable.innerHTML='<tr><th>Employee</th><th>Date</th><th>Plate</th><th>Type</th><th>Fuel Card</th><th>TnG</th><th>Status</th></tr>'+(db.vehicles||[]).map(v=>`<tr><td>${v.employee}</td><td>${v.date}</td><td>${v.plate||''}</td><td>${v.type||''}</td><td>${v.fuelCard||''}</td><td>${v.tng||''}</td><td>${v.status}</td></tr>`).join('');
+ if(document.getElementById('expenseTable')) expenseTable.innerHTML='<tr><th>Claim No.</th><th>Employee</th><th>Date</th><th>Type</th><th>Amount</th><th>Budget Status</th><th>Status</th></tr>'+(db.claims||[]).map(c=>`<tr><td>${c.no||''}</td><td>${emp(c.employee).name||c.employee||''}</td><td>${c.expenseDate||''}</td><td>${c.type||''}</td><td>RM ${money(c.amount)}</td><td>${c.budgetStatus||''}</td><td>${c.status||''}</td></tr>`).join('');
+}
+
+function generateContract(blank=false){
+let e=blank?{}:emp(contractEmployee.value);
+const cv=(v)=>blank?'':(v||'');
+const r=(l,v='')=>`<div class="contract-row"><div class="contract-label">${l}</div><div class="contract-value"><div class="contract-line">${v||''}</div></div></div>`;
+contractPrint.innerHTML=`<div class="a4 contract-a4">${header('EMPLOYMENT<br>CONTRACT')}
+
+<div class="contract-section">
+<div class="contract-section-title">A. PARTIES</div>
+<div class="contract-text">
+This Employment Contract is made between <b>${db.settings.companyName}</b> (Company Registration No.: ${db.settings.companyNo}), hereinafter referred to as <b>"the Company"</b>, and the employee named below, hereinafter referred to as <b>"the Employee"</b>.
+</div>
+</div>
+
+<div class="contract-grid">
+<div class="contract-section">
+<div class="contract-section-title">B. EMPLOYEE INFORMATION</div>
+${r('Employee Name',cv(e.name))}
+${r('Employee ID',cv(e.id))}
+${r('IC No.',cv(e.ic))}
+${r('EPF / KWSP No.',cv(e.epf))}
+${r('SOCSO / PERKESO No.',cv(e.socso))}
+${r('Income Tax No.',cv(e.tax))}
+</div>
+
+<div class="contract-section">
+<div class="contract-section-title">C. EMPLOYMENT DETAILS</div>
+${r('Position',cv(e.position))}
+${r('Department',cv(e.department))}
+${r('Start Date',cv(contractStartDate.value))}
+${r('Contract Type',cv(contractType.value))}
+${r('Probation Period',cv(contractProbation.value||db.settings.probation||'3 months'))}
+${r('Work Location',cv(contractLocation.value))}
+</div>
+</div>
+
+<div class="contract-grid">
+<div class="contract-section">
+<div class="contract-section-title">D. SALARY & BENEFITS</div>
+${r('Basic Salary',blank?'':'RM '+money(e.salary||0))}
+${r('Fixed Allowance',blank?'':'RM '+money(e.allowance||0)+' per month')}
+${r('Variable Allowance',blank?'':'Outstation RM '+money(db.settings.outstationRate||70)+' / approved day, or management approved amount')}
+${r('EPF / SOCSO / EIS',blank?'':'Subject to statutory requirement')}
+${r('Annual Leave',cv(contractAnnualLeave.value||((e.annualEntitlement||8)+' days per year')))}
+${r('Public Holiday',cv(db.settings.publicHoliday||'Malaysia gazetted public holidays applicable in Sabah'))}
+</div>
+
+<div class="contract-section">
+<div class="contract-section-title">E. WORKING ARRANGEMENT</div>
+${r('Mon–Fri',cv(db.settings.weekdayHours||'Monday to Friday, 8:00 AM – 5:00 PM'))}
+${r('Saturday',cv(db.settings.saturdayHours||'Saturday, 8:00 AM – 1:00 PM'))}
+${r('Rest Day',cv(db.settings.restDay||'Sunday'))}
+${r('Notice Period',cv(contractNotice.value||db.settings.notice||'1 month'))}
+${r('Salary Payment',cv(db.settings.salaryPayment||'On or before the 7th day of the following month'))}
+</div>
+</div>
+
+<div class="contract-section">
+<div class="contract-section-title">F. TERMS & CONDITIONS</div>
+<div class="contract-text">
+<ol>
+<li>The Employee shall perform duties honestly, diligently, and in the best interest of the Company.</li>
+<li>The Employee shall comply with all company rules, safety procedures, attendance requirements, and reasonable instructions.</li>
+<li>The Employee shall keep company information, customer information, pricing, documents, and business matters confidential.</li>
+<li>Salary payment, leave, overtime, statutory contributions, and termination shall follow applicable Malaysian employment laws and Company policy.</li>
+<li>Either party may terminate employment by giving the notice stated above or payment in lieu of notice, subject to applicable law.</li>
+</ol>
+</div>
+</div>
+
+<div class="contract-section">
+<div class="contract-section-title">G. ADDITIONAL TERMS / REMARKS</div>
+<div class="contract-remarks">
+<div class="multi-line">${blank?'':contractRemarks.value}</div>
+<div class="multi-line"></div>
+</div>
+</div>
+
+<div class="contract-signature">
+<div class="sig">For and on behalf of Company<br><small>Signature / Name / Date</small></div>
+<div class="sig">Employee Acceptance<br><small>Signature / Name / Date</small></div>
+</div>
+
+<div class="footer">Generated by GME Marketing HRMS Professional v3.1.5</div>
+</div>`;
+}
+function printOnly(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('printing'));document.getElementById(id).classList.add('printing');setTimeout(()=>window.print(),150)}
+function saveSettings(){db.settings={companyName:setCompanyName.value,companyNo:setCompanyNo.value,tel:setTel.value,email:setEmail.value,address:setAddress.value,weekdayHours:setWeekdayHours.value,saturdayHours:setSaturdayHours.value,restDay:setRestDay.value,publicHoliday:setPublicHoliday.value,probation:setProbation.value,notice:setNotice.value,salaryPayment:setSalaryPayment.value,outstationRate:Number(setOutstationRate.value||70),employerEpf:setEmployerEpf.value,employerSocso:setEmployerSocso.value,employerTax:setEmployerTax.value};saveDB();alert('Settings saved')}
+function loadSettings(){setCompanyName.value=db.settings.companyName;setCompanyNo.value=db.settings.companyNo;setTel.value=db.settings.tel;setEmail.value=db.settings.email;setAddress.value=db.settings.address;setWeekdayHours.value=db.settings.weekdayHours||'Monday to Friday, 8:00 AM – 5:00 PM';setSaturdayHours.value=db.settings.saturdayHours||'Saturday, 8:00 AM – 1:00 PM';setRestDay.value=db.settings.restDay||'Sunday';setPublicHoliday.value=db.settings.publicHoliday||'Malaysia gazetted public holidays applicable in Sabah';setProbation.value=db.settings.probation||'3 months';setNotice.value=db.settings.notice||'1 month';setSalaryPayment.value=db.settings.salaryPayment||'On or before the 7th day of the following month';setOutstationRate.value=db.settings.outstationRate||70; if(document.getElementById('setEmployerEpf'))setEmployerEpf.value=db.settings.employerEpf||'Pending Registration'; if(document.getElementById('setEmployerSocso'))setEmployerSocso.value=db.settings.employerSocso||'Pending Registration'; if(document.getElementById('setEmployerTax'))setEmployerTax.value=db.settings.employerTax||''}
+let backupCompletedThisSession=false;
+let backupDirty=localStorage.getItem('gmeHRMSBackupDirty')==='1';
+function markBackupDirty(){
+ backupDirty=true;
+ localStorage.setItem('gmeHRMSBackupDirty','1');
+ updateDashboardBackupStatus();
+}
+function getBackupHistory(){
+ try{return JSON.parse(localStorage.getItem('gmeHRMSBackupHistory')||'[]')}catch(e){return []}
+}
+function saveBackupHistory(history){localStorage.setItem('gmeHRMSBackupHistory',JSON.stringify(history.slice(0,10)))}
+function formatBytes(bytes){
+ if(bytes<1024)return bytes+' B';
+ if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB';
+ return (bytes/1024/1024).toFixed(2)+' MB';
+}
+function databaseSize(){return new Blob([JSON.stringify(db)]).size}
+function backupAgeDays(){
+ const last=localStorage.getItem('gmeHRMSLastBackup');
+ if(!last)return Infinity;
+ return Math.floor((Date.now()-new Date(last).getTime())/86400000);
+}
+function updateDashboardBackupStatus(){
+ const el=document.getElementById('dashboardBackupStatus'); if(!el)return;
+ const last=localStorage.getItem('gmeHRMSLastBackup');
+ const age=backupAgeDays();
+ if(!last){el.className='backup-status warn';el.textContent='Backup recommended: no JSON backup has been recorded yet.';return}
+ if(backupDirty){el.className='backup-status warn';el.textContent='Backup recommended: records have changed since the last JSON backup ('+new Date(last).toLocaleString('en-MY')+').';return}
+ if(age>=7){el.className='backup-status warn';el.textContent='Backup recommended: the last JSON backup is '+age+' days old.';return}
+ el.className='backup-status good';el.textContent='Backup up to date. Last exported: '+new Date(last).toLocaleString('en-MY')+'.';
+}
+function exportBackup(){
+ try{
+  const now=new Date();
+  let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  let a=document.createElement('a');
+  const url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download='GME_HRMS_Professional_v3.1.5_Backup_'+now.toISOString().replace(/[:.]/g,'-')+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const stamp=now.toISOString();
+  localStorage.setItem('gmeHRMSLastBackup',stamp);
+  backupCompletedThisSession=true;backupDirty=false;localStorage.setItem('gmeHRMSBackupDirty','0');
+  const history=getBackupHistory();history.unshift({date:stamp,file:a.download,size:blob.size});saveBackupHistory(history);
+  updateDashboardBackupStatus();
+  return true;
+ }catch(err){alert('Backup could not be exported. Please try again.');return false}
+}
+function renderBackupManager(){
+ const last=localStorage.getItem('gmeHRMSLastBackup');
+ const age=backupAgeDays();
+ const status=document.getElementById('backupManagerStatus');
+ document.getElementById('bmLastBackup').textContent=last?new Date(last).toLocaleString('en-MY'):'Never';
+ document.getElementById('bmDirty').textContent=backupDirty?'Yes — backup recommended':'No';
+ document.getElementById('bmDbSize').textContent=formatBytes(databaseSize());
+ document.getElementById('bmVersion').textContent='v'+(db.version||'3.1.4');
+ if(!last){status.className='backup-status warn';status.textContent='No JSON backup has been recorded. Please create your first backup now.'}
+ else if(backupDirty){status.className='backup-status warn';status.textContent='Your records changed after the last backup. Create a fresh JSON backup before exiting.'}
+ else if(age>=7){status.className='backup-status warn';status.textContent='Your last backup is '+age+' days old. A fresh backup is recommended.'}
+ else{status.className='backup-status good';status.textContent='Your latest saved records are covered by the JSON backup.'}
+ const h=getBackupHistory();
+ document.getElementById('backupHistoryTable').innerHTML='<tr><th>Date & Time</th><th>File</th><th>Size</th></tr>'+(h.length?h.map(x=>`<tr><td>${new Date(x.date).toLocaleString('en-MY')}</td><td>${x.file||''}</td><td>${formatBytes(Number(x.size||0))}</td></tr>`).join(''):'<tr><td colspan="3">No backup history yet.</td></tr>');
+}
+function openBackupManager(){renderBackupManager();document.getElementById('backupManagerModal').classList.add('open')}
+function closeBackupManager(){document.getElementById('backupManagerModal').classList.remove('open')}
+function backupNowFromManager(){if(exportBackup()){renderBackupManager();alert('JSON backup exported successfully.')}}
+function safeExitFromManager(){
+ if(backupDirty||!localStorage.getItem('gmeHRMSLastBackup')){
+  if(!confirm('A fresh backup is recommended. Exit without creating a new JSON backup?'))return;
+ }
+ closeBackupManager();
+ window.close();
+ setTimeout(()=>alert('Your browser may block automatic closing. You can now close this tab safely.'),250);
+}
+function importBackup(e){
+ let f=e.target.files[0];if(!f)return;
+ let r=new FileReader();
+ r.onload=()=>{
+  try{
+   const imported=JSON.parse(r.result);
+   if(!imported||!Array.isArray(imported.employees))throw new Error('Invalid backup format');
+   db=imported;migrateDB();localStorage.setItem('gmeHRMSv2',JSON.stringify(db));
+   backupDirty=false;localStorage.setItem('gmeHRMSBackupDirty','0');
+   loadSettings();refreshAll();updateDashboardBackupStatus();
+   if(document.getElementById('backupManagerModal').classList.contains('open'))renderBackupManager();
+   alert('Backup restored successfully.');
+  }catch(err){alert('This file is not a valid GME HRMS JSON backup.');}
+  e.target.value='';
+ };
+ r.readAsText(f);
+}
+window.onload=()=>{payDate.value=today();payMonth.value=monthNow();advRequestDate.value=today();leaveApplyDate.value=today(); if(document.getElementById('outStart')){outStart.value=today();outEnd.value=today();outRate.value=db.settings.outstationRate||70;calcOutstation();}contractStartDate.value=today(); if(document.getElementById('exDate'))exDate.value=today(); if(document.getElementById('assetIssueDate'))assetIssueDate.value=today(); if(document.getElementById('vehDate'))vehDate.value=today(); if(document.getElementById('claimDate'))newClaim(); if(document.getElementById('payClaimsReimbursement'))loadPayrollClaims(); newEmployee();loadSettings();refreshAll();generateAdvanceForm(true);generateLeaveForm(true);generateContract(true);generateOutstationForm(true);generateExceptionForm(true);generateAssetForm(true);generateVehicleForm(true);generateClaimForm(true);updateDashboardBackupStatus()}
+</script>
+</body></html>
