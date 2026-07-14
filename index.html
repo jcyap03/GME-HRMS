@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GME HRMS Professional v4.2 PWA</title>
+<title>GME HRMS Professional v4.2.1 PWA</title>
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -153,7 +153,7 @@ input[type=number]{text-align:right}.btn{border:0;border-radius:7px;padding:10px
 </style>
 </head>
 <body>
-<div class="mobile-topbar no-print"><button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰ Menu</button><strong>GME HRMS v4.2</strong><span id="pwaState" class="pwa-state">Ready</span></div>
+<div class="mobile-topbar no-print"><button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰ Menu</button><strong>GME HRMS v4.2.1</strong><span id="pwaState" class="pwa-state">Ready</span></div>
 <div id="offlineBanner" class="offline-banner">Offline mode — changes remain saved on this device</div>
 <div class="app">
 <aside class="sidebar no-print">
@@ -490,7 +490,7 @@ input[type=number]{text-align:right}.btn{border:0;border-radius:7px;padding:10px
 <script>
 const defaultData={settings:{companyName:'GME MARKETING',companyNo:'0000200330T',tel:'019-871 9868',email:'gme.sbkk@gmail.com',address:'G-G-60, Lorong Inanam Kapital 5, Inanam Kapital,\\nJalan Nountun, Inanam, 88450 Kota Kinabalu, Sabah',weekdayHours:'Monday to Friday, 8:00 AM – 5:00 PM',saturdayHours:'Saturday, 8:00 AM – 1:00 PM',restDay:'Sunday',publicHoliday:'Malaysia gazetted public holidays applicable in Sabah',probation:'3 months',notice:'1 month',salaryPayment:'On or before the 7th day of the following month',outstationRate:70},employees:[{id:'EMP001',name:'Kwan Khar Lien',ic:'810302-12-5349',position:'General Manager',department:'',bank:'Hong Leong 28651215655',salary:2000,allowance:1000,epf:'',socso:'',tax:'',annualEntitlement:8,sickEntitlement:14,documents:[],status:'Active'},{id:'EMP002',name:'Sabri Bin Aris',ic:'920925-12-5123',position:'Store Supervisor',department:'',bank:'Public Bank 6822704228',salary:2000,allowance:0,epf:'',socso:'',tax:'',annualEntitlement:8,sickEntitlement:14,documents:[],status:'Active'},{id:'EMP003',name:'John Abed Amran @ Alfred',ic:'020308-12-0069',position:'Lorry Driver',department:'',bank:'',salary:2300,allowance:0,epf:'',socso:'',tax:'',annualEntitlement:8,sickEntitlement:14,documents:[],status:'Active'}],advances:[],leaves:[],outstations:[],exceptions:[],assets:[],vehicles:[],claims:[],companyExpenses:[]}
 let db=JSON.parse(localStorage.getItem('gmeHRMSv2')||'null')||defaultData, selectedEmpId='';
-function migrateDB(){db.settings=db.settings||defaultData.settings; db.settings.weekdayHours='Monday to Friday, 8:00 AM – 5:00 PM'; db.settings.saturdayHours='Saturday, 8:00 AM – 1:00 PM'; db.settings.restDay='Sunday'; db.settings.publicHoliday='Malaysia gazetted public holidays applicable in Sabah'; db.employees=db.employees||[]; db.advances=db.advances||[]; db.leaves=db.leaves||[]; db.outstations=db.outstations||[]; db.exceptions=db.exceptions||[]; db.assets=db.assets||[]; db.vehicles=db.vehicles||[]; db.claims=db.claims||[]; db.companyExpenses=db.companyExpenses||[]; db.version='4.2';}
+function migrateDB(){db.settings=db.settings||defaultData.settings; db.settings.weekdayHours='Monday to Friday, 8:00 AM – 5:00 PM'; db.settings.saturdayHours='Saturday, 8:00 AM – 1:00 PM'; db.settings.restDay='Sunday'; db.settings.publicHoliday='Malaysia gazetted public holidays applicable in Sabah'; db.employees=db.employees||[]; db.advances=db.advances||[]; db.leaves=db.leaves||[]; db.outstations=db.outstations||[]; db.exceptions=db.exceptions||[]; db.assets=db.assets||[]; db.vehicles=db.vehicles||[]; db.claims=db.claims||[]; try{const separateExpenses=JSON.parse(localStorage.getItem('gmeCompanyExpensesV1')||'null');db.companyExpenses=Array.isArray(separateExpenses)?separateExpenses:(db.companyExpenses||[])}catch(e){db.companyExpenses=db.companyExpenses||[]} db.version='4.2.1';}
 migrateDB();
 function saveDB(){localStorage.setItem('gmeHRMSv2',JSON.stringify(db));markBackupDirty();refreshAll()}function today(){return new Date().toISOString().slice(0,10)}function monthNow(){let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}function money(v){return Number(v||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2})}function num(id){return Number(document.getElementById(id)?.value||0)}function emp(id){return db.employees.find(e=>e.id===id)||{}}
 function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.querySelectorAll('.mobile-bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(window.innerWidth<=800)window.scrollTo({top:0,behavior:'smooth'});} function mobileGo(id,btn){showPage(id);document.querySelectorAll('.mobile-bottom-nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
@@ -740,19 +740,80 @@ function generateClaimForm(blank=false){let c=blank?{}:(db.claims||[]).find(x=>x
 
 
 let selectedCompanyExpenseNo='';
+function ce(id){return document.getElementById(id)}
 function nextCompanyExpenseNo(){let y=new Date().getFullYear(),max=0;(db.companyExpenses||[]).forEach(x=>{let m=String(x.no||'').match(/(\d+)$/);if(m)max=Math.max(max,Number(m[1]))});return 'CEX-'+y+'-'+String(max+1).padStart(4,'0')}
-function newCompanyExpense(){selectedCompanyExpenseNo='';coExpNo.value=nextCompanyExpenseNo();coExpDate.value=today();coExpMonth.value=monthNow();coExpSupplier.value='';coExpCategory.selectedIndex=0;coExpAmount.value=0;coExpAccount.value='Company Bank Account';coExpBank.value='';coExpReference.value='';coExpInvoice.value='';coExpStatus.value='Paid';coExpTax.value='Normal Business Expense';coExpDescription.value='';coExpFiles.value='';coExpFileRemarks.value='';renderCompanyExpenseFiles([])}
-function readCompanyExpenseFiles(){return Promise.all(Array.from(coExpFiles.files||[]).map(f=>new Promise(resolve=>{if(f.size>8*1024*1024){resolve({error:true,name:f.name});return}let r=new FileReader();r.onload=()=>resolve({name:f.name,type:f.type,size:f.size,data:r.result,remarks:coExpFileRemarks.value,uploadedAt:new Date().toISOString()});r.onerror=()=>resolve(null);r.readAsDataURL(f)})))}
-async function saveCompanyExpense(){if(!coExpDate.value){alert('Please enter the payment date.');return}if(!coExpSupplier.value.trim()){alert('Please enter supplier / payee.');return}if(num('coExpAmount')<=0){alert('Please enter the amount paid.');return}let existing=(db.companyExpenses||[]).find(x=>x.no===coExpNo.value);let files=await readCompanyExpenseFiles();let tooLarge=files.filter(x=>x?.error);if(tooLarge.length){alert('These files are above 8 MB and were not added: '+tooLarge.map(x=>x.name).join(', '));}let valid=files.filter(x=>x&&!x.error);let record={no:coExpNo.value||nextCompanyExpenseNo(),date:coExpDate.value,month:coExpMonth.value||coExpDate.value.slice(0,7),supplier:coExpSupplier.value.trim(),category:coExpCategory.value,amount:num('coExpAmount'),account:coExpAccount.value,bank:coExpBank.value,reference:coExpReference.value,invoice:coExpInvoice.value,status:coExpStatus.value,taxTreatment:coExpTax.value,description:coExpDescription.value,attachments:[...((existing&&existing.attachments)||[]),...valid],updatedAt:new Date().toISOString()};db.companyExpenses=db.companyExpenses||[];let i=db.companyExpenses.findIndex(x=>x.no===record.no);i>=0?db.companyExpenses[i]=record:db.companyExpenses.push(record);selectedCompanyExpenseNo=record.no;saveDB();coExpFiles.value='';renderCompanyExpenseFiles(record.attachments);alert('Company account expense saved.')}
-function editCompanyExpense(no){let x=(db.companyExpenses||[]).find(e=>e.no===no);if(!x)return;selectedCompanyExpenseNo=x.no;coExpNo.value=x.no;coExpDate.value=x.date||'';coExpMonth.value=x.month||String(x.date||'').slice(0,7);coExpSupplier.value=x.supplier||'';coExpCategory.value=x.category||'Other Company Expense';coExpAmount.value=x.amount||0;coExpAccount.value=x.account||'Company Bank Account';coExpBank.value=x.bank||'';coExpReference.value=x.reference||'';coExpInvoice.value=x.invoice||'';coExpStatus.value=x.status||'Paid';coExpTax.value=x.taxTreatment||'To Be Confirmed';coExpDescription.value=x.description||'';coExpFiles.value='';coExpFileRemarks.value='';renderCompanyExpenseFiles(x.attachments||[]);showPage('companyexpenses');window.scrollTo({top:0,behavior:'smooth'})}
-function deleteCompanyExpense(){let no=selectedCompanyExpenseNo||coExpNo.value;if(!no||!(db.companyExpenses||[]).some(x=>x.no===no)){alert('Please select an existing record first.');return}if(confirm('Delete company expense '+no+'?')){db.companyExpenses=(db.companyExpenses||[]).filter(x=>x.no!==no);saveDB();newCompanyExpense()}}
-function renderCompanyExpenseFiles(files){let box=document.getElementById('coExpExistingFiles');if(!box)return;box.innerHTML=files.length?files.map((f,i)=>`<span class="file-chip">📎 ${escapeHtml(f.name||'Attachment')} <button type="button" class="btn secondary" style="min-height:28px;padding:3px 7px;margin:0" onclick="openCompanyExpenseFile(${i})">Open</button><button type="button" class="btn red" style="min-height:28px;padding:3px 7px;margin:0" onclick="removeCompanyExpenseFile(${i})">×</button></span>`).join(''):'<span class="note">No attachment saved.</span>'}
-function openCompanyExpenseFile(index){let x=(db.companyExpenses||[]).find(e=>e.no===(selectedCompanyExpenseNo||coExpNo.value));let f=x?.attachments?.[index];if(!f?.data){alert('Attachment not found.');return}let a=document.createElement('a');a.href=f.data;a.download=f.name||'attachment';a.target='_blank';a.click()}
-function removeCompanyExpenseFile(index){let x=(db.companyExpenses||[]).find(e=>e.no===(selectedCompanyExpenseNo||coExpNo.value));if(!x)return;if(confirm('Remove this attachment?')){x.attachments.splice(index,1);saveDB();renderCompanyExpenseFiles(x.attachments)}}
+function persistCompanyExpenses(){
+ try{localStorage.setItem('gmeCompanyExpensesV1',JSON.stringify(db.companyExpenses||[]));return true}
+ catch(err){console.error(err);return false}
+}
+function newCompanyExpense(){
+ selectedCompanyExpenseNo='';
+ const values={coExpNo:nextCompanyExpenseNo(),coExpDate:today(),coExpMonth:monthNow(),coExpSupplier:'',coExpAmount:0,coExpBank:'',coExpReference:'',coExpInvoice:'',coExpDescription:'',coExpFileRemarks:''};
+ Object.entries(values).forEach(([id,v])=>{const e=ce(id);if(e)e.value=v});
+ if(ce('coExpCategory'))ce('coExpCategory').selectedIndex=0;
+ if(ce('coExpAccount'))ce('coExpAccount').value='Company Bank Account';
+ if(ce('coExpStatus'))ce('coExpStatus').value='Paid';
+ if(ce('coExpTax'))ce('coExpTax').value='Normal Business Expense';
+ if(ce('coExpFiles'))ce('coExpFiles').value='';
+ renderCompanyExpenseFiles([]);
+}
+function readCompanyExpenseFiles(){
+ const input=ce('coExpFiles'),remarks=ce('coExpFileRemarks')?.value||'';
+ return Promise.all(Array.from(input?.files||[]).map(f=>new Promise(resolve=>{
+  if(f.size>2*1024*1024){resolve({error:true,name:f.name,reason:'above 2 MB'});return}
+  let r=new FileReader();
+  r.onload=()=>resolve({name:f.name,type:f.type,size:f.size,data:r.result,remarks,uploadedAt:new Date().toISOString()});
+  r.onerror=()=>resolve({error:true,name:f.name,reason:'could not be read'});
+  r.readAsDataURL(f);
+ })));
+}
+async function saveCompanyExpense(){
+ const date=ce('coExpDate')?.value||'', supplier=(ce('coExpSupplier')?.value||'').trim(), amount=Number(ce('coExpAmount')?.value||0);
+ if(!date){alert('Please enter the payment date.');return}
+ if(!supplier){alert('Please enter supplier / payee.');return}
+ if(amount<=0){alert('Please enter the amount paid.');return}
+ const no=ce('coExpNo')?.value||nextCompanyExpenseNo();
+ const existing=(db.companyExpenses||[]).find(x=>x.no===no);
+ const files=await readCompanyExpenseFiles();
+ const rejected=files.filter(x=>x?.error),valid=files.filter(x=>x&&!x.error);
+ const baseAttachments=[...((existing&&existing.attachments)||[])];
+ const record={no,date,month:ce('coExpMonth')?.value||date.slice(0,7),supplier,category:ce('coExpCategory')?.value||'Other Company Expense',amount,account:ce('coExpAccount')?.value||'Company Bank Account',bank:ce('coExpBank')?.value||'',reference:ce('coExpReference')?.value||'',invoice:ce('coExpInvoice')?.value||'',status:ce('coExpStatus')?.value||'Paid',taxTreatment:ce('coExpTax')?.value||'To Be Confirmed',description:ce('coExpDescription')?.value||'',attachments:[...baseAttachments,...valid],updatedAt:new Date().toISOString()};
+ db.companyExpenses=db.companyExpenses||[];
+ const oldIndex=db.companyExpenses.findIndex(x=>x.no===record.no), oldRecord=oldIndex>=0?db.companyExpenses[oldIndex]:null;
+ if(oldIndex>=0)db.companyExpenses[oldIndex]=record;else db.companyExpenses.push(record);
+ let saved=persistCompanyExpenses();
+ let attachmentsSkipped=false;
+ if(!saved&&valid.length){
+  record.attachments=baseAttachments;
+  if(oldIndex>=0)db.companyExpenses[oldIndex]=record;else db.companyExpenses[db.companyExpenses.length-1]=record;
+  saved=persistCompanyExpenses();attachmentsSkipped=saved;
+ }
+ if(!saved){
+  if(oldIndex>=0)db.companyExpenses[oldIndex]=oldRecord;else db.companyExpenses.pop();
+  alert('Unable to save because this browser storage is full. Please export a JSON backup and remove some large documents or attachments, then try again.');return;
+ }
+ selectedCompanyExpenseNo=record.no;
+ markBackupDirty();refreshAll();
+ if(ce('coExpFiles'))ce('coExpFiles').value='';
+ renderCompanyExpenseFiles(record.attachments||[]);
+ let msg='Company account expense saved successfully.';
+ if(attachmentsSkipped)msg+=' The record was saved, but the new attachment was skipped because browser storage is full.';
+ if(rejected.length)msg+=' Files not added: '+rejected.map(x=>x.name+' ('+x.reason+')').join(', ')+'.';
+ alert(msg);
+}
+function editCompanyExpense(no){
+ let x=(db.companyExpenses||[]).find(e=>e.no===no);if(!x)return;selectedCompanyExpenseNo=x.no;
+ const values={coExpNo:x.no,coExpDate:x.date||'',coExpMonth:x.month||String(x.date||'').slice(0,7),coExpSupplier:x.supplier||'',coExpCategory:x.category||'Other Company Expense',coExpAmount:x.amount||0,coExpAccount:x.account||'Company Bank Account',coExpBank:x.bank||'',coExpReference:x.reference||'',coExpInvoice:x.invoice||'',coExpStatus:x.status||'Paid',coExpTax:x.taxTreatment||'To Be Confirmed',coExpDescription:x.description||'',coExpFileRemarks:''};
+ Object.entries(values).forEach(([id,v])=>{const e=ce(id);if(e)e.value=v});if(ce('coExpFiles'))ce('coExpFiles').value='';renderCompanyExpenseFiles(x.attachments||[]);showPage('companyexpenses');window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteCompanyExpense(){let no=selectedCompanyExpenseNo||ce('coExpNo')?.value;if(!no||!(db.companyExpenses||[]).some(x=>x.no===no)){alert('Please select an existing record first.');return}if(confirm('Delete company expense '+no+'?')){db.companyExpenses=(db.companyExpenses||[]).filter(x=>x.no!==no);if(!persistCompanyExpenses()){alert('Unable to update browser storage.');return}markBackupDirty();refreshAll();newCompanyExpense()}}
+function renderCompanyExpenseFiles(files){let box=ce('coExpExistingFiles');if(!box)return;box.innerHTML=files.length?files.map((f,i)=>`<span class="file-chip">📎 ${escapeHtml(f.name||'Attachment')} <button type="button" class="btn secondary" style="min-height:28px;padding:3px 7px;margin:0" onclick="openCompanyExpenseFile(${i})">Open</button><button type="button" class="btn red" style="min-height:28px;padding:3px 7px;margin:0" onclick="removeCompanyExpenseFile(${i})">×</button></span>`).join(''):'<span class="note">No attachment saved.</span>'}
+function openCompanyExpenseFile(index){let x=(db.companyExpenses||[]).find(e=>e.no===(selectedCompanyExpenseNo||ce('coExpNo')?.value));let f=x?.attachments?.[index];if(!f?.data){alert('Attachment not found.');return}let a=document.createElement('a');a.href=f.data;a.download=f.name||'attachment';a.target='_blank';a.click()}
+function removeCompanyExpenseFile(index){let x=(db.companyExpenses||[]).find(e=>e.no===(selectedCompanyExpenseNo||ce('coExpNo')?.value));if(!x)return;if(confirm('Remove this attachment?')){x.attachments.splice(index,1);if(!persistCompanyExpenses()){alert('Unable to update browser storage.');return}markBackupDirty();refreshAll();renderCompanyExpenseFiles(x.attachments)}}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-function companyExpenseFiltered(){let m=document.getElementById('coExpFilterMonth')?.value||'',cat=document.getElementById('coExpFilterCategory')?.value||'',q=(document.getElementById('coExpSearch')?.value||'').toLowerCase();return (db.companyExpenses||[]).filter(x=>(!m||(x.month||x.date||'').startsWith(m))&&(!cat||x.category===cat)&&(!q||[x.no,x.supplier,x.reference,x.invoice,x.description,x.category].join(' ').toLowerCase().includes(q))).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))}
-function refreshCompanyExpenseRegister(){let cat=document.getElementById('coExpFilterCategory');if(cat&&cat.options.length<=1){let current=cat.value;let cats=[...new Set((db.companyExpenses||[]).map(x=>x.category).filter(Boolean))].sort();cat.innerHTML='<option value="">All Categories</option>'+cats.map(x=>`<option>${escapeHtml(x)}</option>`).join('');cat.value=current}let rows=companyExpenseFiltered();let total=rows.filter(x=>x.status!=='Cancelled').reduce((s,x)=>s+Number(x.amount||0),0),paid=rows.filter(x=>x.status==='Paid').reduce((s,x)=>s+Number(x.amount||0),0),pending=rows.filter(x=>['Pending','Partially Paid'].includes(x.status)).reduce((s,x)=>s+Number(x.amount||0),0);if(document.getElementById('coExpMonthTotal'))coExpMonthTotal.textContent='RM '+money(total);if(document.getElementById('coExpPaidTotal'))coExpPaidTotal.textContent='RM '+money(paid);if(document.getElementById('coExpPendingTotal'))coExpPendingTotal.textContent='RM '+money(pending);if(document.getElementById('coExpRecordCount'))coExpRecordCount.textContent=rows.length;let t=document.getElementById('companyExpenseTable');if(t)t.innerHTML='<tr><th>No.</th><th>Date</th><th>Supplier / Payee</th><th>Category</th><th>Paid From</th><th>Reference</th><th>Amount</th><th>Status</th><th>Files</th><th>Action</th></tr>'+rows.map(x=>`<tr><td>${escapeHtml(x.no)}</td><td>${escapeHtml(x.date)}</td><td>${escapeHtml(x.supplier)}</td><td>${escapeHtml(x.category)}</td><td>${escapeHtml(x.account)}</td><td>${escapeHtml(x.reference||x.invoice||'')}</td><td>RM ${money(x.amount)}</td><td>${escapeHtml(x.status)}</td><td>${(x.attachments||[]).length}</td><td><button class="btn secondary" onclick="editCompanyExpense('${x.no}')">Edit</button></td></tr>`).join('')}
-function exportCompanyExpensesCSV(){let rows=companyExpenseFiltered();if(!rows.length){alert('No company expense records found for the selected filter.');return}let headers=['Record No','Payment Date','Accounting Month','Supplier / Payee','Category','Description','Paid From','Bank / Account','Payment Reference','Invoice / Receipt No','Amount (RM)','Status','Tax Treatment','Attachment Count'];let csv=[headers,...rows.map(x=>[x.no,x.date,x.month,x.supplier,x.category,x.description,x.account,x.bank,x.reference,x.invoice,Number(x.amount||0).toFixed(2),x.status,x.taxTreatment,(x.attachments||[]).length])].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='GME_Company_Expenses_'+(coExpFilterMonth.value||'All')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function companyExpenseFiltered(){let m=ce('coExpFilterMonth')?.value||'',cat=ce('coExpFilterCategory')?.value||'',q=(ce('coExpSearch')?.value||'').toLowerCase();return (db.companyExpenses||[]).filter(x=>(!m||(x.month||x.date||'').startsWith(m))&&(!cat||x.category===cat)&&(!q||[x.no,x.supplier,x.reference,x.invoice,x.description,x.category].join(' ').toLowerCase().includes(q))).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))}
+function refreshCompanyExpenseRegister(){let cat=ce('coExpFilterCategory');if(cat&&cat.options.length<=1){let current=cat.value;let cats=[...new Set((db.companyExpenses||[]).map(x=>x.category).filter(Boolean))].sort();cat.innerHTML='<option value="">All Categories</option>'+cats.map(x=>`<option>${escapeHtml(x)}</option>`).join('');cat.value=current}let rows=companyExpenseFiltered();let total=rows.filter(x=>x.status!=='Cancelled').reduce((s,x)=>s+Number(x.amount||0),0),paid=rows.filter(x=>x.status==='Paid').reduce((s,x)=>s+Number(x.amount||0),0),pending=rows.filter(x=>['Pending','Partially Paid'].includes(x.status)).reduce((s,x)=>s+Number(x.amount||0),0);const vals={coExpMonthTotal:'RM '+money(total),coExpPaidTotal:'RM '+money(paid),coExpPendingTotal:'RM '+money(pending),coExpRecordCount:rows.length};Object.entries(vals).forEach(([id,v])=>{if(ce(id))ce(id).textContent=v});let t=ce('companyExpenseTable');if(t)t.innerHTML='<tr><th>No.</th><th>Date</th><th>Supplier / Payee</th><th>Category</th><th>Paid From</th><th>Reference</th><th>Amount</th><th>Status</th><th>Files</th><th>Action</th></tr>'+rows.map(x=>`<tr><td>${escapeHtml(x.no)}</td><td>${escapeHtml(x.date)}</td><td>${escapeHtml(x.supplier)}</td><td>${escapeHtml(x.category)}</td><td>${escapeHtml(x.account)}</td><td>${escapeHtml(x.reference||x.invoice||'')}</td><td>RM ${money(x.amount)}</td><td>${escapeHtml(x.status)}</td><td>${(x.attachments||[]).length}</td><td><button class="btn secondary" onclick="editCompanyExpense('${x.no}')">Edit</button></td></tr>`).join('')}
+function exportCompanyExpensesCSV(){let rows=companyExpenseFiltered();if(!rows.length){alert('No company expense records found for the selected filter.');return}let headers=['Record No','Payment Date','Accounting Month','Supplier / Payee','Category','Description','Paid From','Bank / Account','Payment Reference','Invoice / Receipt No','Amount (RM)','Status','Tax Treatment','Attachment Count'];let csv=[headers,...rows.map(x=>[x.no,x.date,x.month,x.supplier,x.category,x.description,x.account,x.bank,x.reference,x.invoice,Number(x.amount||0).toFixed(2),x.status,x.taxTreatment,(x.attachments||[]).length])].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='GME_Company_Expenses_'+(ce('coExpFilterMonth')?.value||'All')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 function refreshReports(){
  refreshClaimRegister();
@@ -990,6 +1051,6 @@ function hidePreview(id){const el=document.getElementById(id);if(el)el.classList
 });
 function updateGreeting(){const h=new Date().getHours();const word=h<12?'Good morning':h<18?'Good afternoon':'Good evening';const el=document.getElementById('welcomeGreeting');if(el)el.textContent=word+' — GME HRMS';}
 
-window.onload=()=>{updateGreeting();updatePWAState();payDate.value=today();payMonth.value=monthNow();advRequestDate.value=today();leaveApplyDate.value=today(); if(document.getElementById('outStart')){outStart.value=today();outEnd.value=today();outRate.value=db.settings.outstationRate||70;calcOutstation();}contractStartDate.value=today(); if(document.getElementById('exDate'))exDate.value=today(); if(document.getElementById('assetIssueDate'))assetIssueDate.value=today(); if(document.getElementById('vehDate'))vehDate.value=today(); if(document.getElementById('claimDate'))newClaim(); if(document.getElementById('coExpDate')){newCompanyExpense();coExpFilterMonth.value=monthNow();refreshCompanyExpenseRegister();} if(document.getElementById('payClaimsReimbursement'))loadPayrollClaims(); newEmployee();loadSettings();refreshAll();updateDashboardBackupStatus()}
+window.onload=()=>{updateGreeting();updatePWAState();payDate.value=today();payMonth.value=monthNow();advRequestDate.value=today();leaveApplyDate.value=today(); if(document.getElementById('outStart')){outStart.value=today();outEnd.value=today();outRate.value=db.settings.outstationRate||70;calcOutstation();}contractStartDate.value=today(); if(document.getElementById('exDate'))exDate.value=today(); if(document.getElementById('assetIssueDate'))assetIssueDate.value=today(); if(document.getElementById('vehDate'))vehDate.value=today(); if(document.getElementById('claimDate'))newClaim(); if(document.getElementById('coExpDate')){newCompanyExpense();if(document.getElementById('coExpFilterMonth'))document.getElementById('coExpFilterMonth').value=monthNow();refreshCompanyExpenseRegister();} if(document.getElementById('payClaimsReimbursement'))loadPayrollClaims(); newEmployee();loadSettings();refreshAll();updateDashboardBackupStatus()}
 </script>
 </body></html>
