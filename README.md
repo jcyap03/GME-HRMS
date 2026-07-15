@@ -1,16 +1,11 @@
-# GME HRMS Professional v4.2.1 PWA
+# GME HRMS Professional v4.4 PWA
 
-Upload all files and the `icons` folder to the root of your GitHub Pages repository.
+GitHub Pages-ready HRMS.
 
-## New in v4.2.1
-- Separate Company Account Expenses ledger for payments made with company funds.
-- Multiple invoice, receipt, PDF and image attachments.
-- Monthly/category/search filtering and CSV export.
-- Dashboard and report totals.
-- Existing v3/v4 JSON backups remain compatible.
+## New in v4.4
+- Multiple supporting attachments for Claims, Leave, Attendance Exceptions and Outstation Allowance
+- Editable and searchable registers for Leave, Attendance Exceptions and Outstation records
+- Open/delete attachments from each saved record
+- Existing JSON backups remain compatible
 
-## Privacy
-Do not upload HRMS JSON backups, employee files, invoices or receipts to GitHub. Those records remain in browser storage and exported JSON backups.
-
-
-Fix: Company Account Expenses save now works reliably on iPhone Safari and shows storage errors clearly.
+Upload all files in this folder to the root of your GitHub repository. Do not upload private JSON backups to a public repository.
