@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GME HRMS Professional v4.4.1 PWA</title>
+<title>GME HRMS Professional v4.5.1 PWA</title>
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -174,11 +174,19 @@ input[type=number]{text-align:right}.btn{border:0;border-radius:7px;padding:10px
 </style>
 </head>
 <body>
-<div class="mobile-topbar no-print"><button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰ Menu</button><strong>GME HRMS v4.5</strong><select id="languageSwitcherMobile" class="language-switcher" onchange="setLanguage(this.value)" aria-label="Language"><option value="en">English</option><option value="ms">Bahasa Melayu</option><option value="zh">中文</option></select><span id="pwaState" class="pwa-state">Ready</span></div>
+<div class="mobile-topbar no-print"><button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰ Menu</button><strong>GME HRMS v4.5.1</strong><select id="languageSwitcherMobile" class="language-switcher" onchange="setLanguage(this.value)" aria-label="Language"><option value="en">English</option><option value="ms">Bahasa Melayu</option><option value="zh">中文</option></select><span id="pwaState" class="pwa-state">Ready</span></div>
 <div id="offlineBanner" class="offline-banner">Offline mode — changes remain saved on this device</div>
 <div class="app">
 <aside class="sidebar no-print">
-<h1>GME HRMS Pro v4.2</h1><p>Installable PWA · Offline-first · Existing data kept</p>
+<h1>GME HRMS Pro v4.5.1</h1><p>Installable PWA · Offline-first · Existing data kept</p>
+<div class="language-panel">
+<label for="languageSwitcherDesktop">Language / Bahasa / 语言</label>
+<select id="languageSwitcherDesktop" class="language-switcher" onchange="setLanguage(this.value)" aria-label="Language">
+<option value="en">English</option>
+<option value="ms">Bahasa Melayu</option>
+<option value="zh">中文</option>
+</select>
+</div>
 <div class="nav">
 <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
 <button onclick="showPage('employees',this)">Employee Master</button>
@@ -1193,7 +1201,7 @@ const _refreshAllV44=refreshAll;refreshAll=function(){_refreshAllV44();refreshLe
 ;(db.outstations||[]).forEach((r,i)=>{r.id=r.id||'OUT-'+String(i+1).padStart(4,'0');r.attachments=r.attachments||[]});
 ;(db.exceptions||[]).forEach((r,i)=>{r.id=r.id||'ATT-'+String(i+1).padStart(4,'0');r.attachments=r.attachments||[]});
 ;(db.claims||[]).forEach(r=>{r.attachments=r.attachments||[];if(r.receipt&&!r.attachments.some(f=>f.data===r.receipt.data))r.attachments.push(r.receipt)});
-db.version='4.5';
+db.version='4.5.1';
 
 
 
