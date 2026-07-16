@@ -1,8 +1,8 @@
-# GME HRMS Professional v4.4 PWA
+# GME HRMS Professional v4.4.1 PWA
 
 GitHub Pages-ready HRMS.
 
-## New in v4.4
+## New in v4.4.1
 - Multiple supporting attachments for Claims, Leave, Attendance Exceptions and Outstation Allowance
 - Editable and searchable registers for Leave, Attendance Exceptions and Outstation records
 - Open/delete attachments from each saved record
