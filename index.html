@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GME HRMS Professional v4.4.1 PWA</title>
+<title>GME HRMS Professional v4.4.2 PWA</title>
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -916,8 +916,15 @@ function refreshReports(){
  if(document.getElementById('companyExpenseReportTable')) companyExpenseReportTable.innerHTML='<tr><th>No.</th><th>Date</th><th>Supplier</th><th>Category</th><th>Paid From</th><th>Amount</th><th>Status</th></tr>'+(db.companyExpenses||[]).map(x=>`<tr><td>${escapeHtml(x.no||'')}</td><td>${escapeHtml(x.date||'')}</td><td>${escapeHtml(x.supplier||'')}</td><td>${escapeHtml(x.category||'')}</td><td>${escapeHtml(x.account||'')}</td><td>RM ${money(x.amount)}</td><td>${escapeHtml(x.status||'')}</td></tr>`).join('');
 }
 
+function formatDateMY(value){
+ if(!value)return '';
+ const m=String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ return m?`${m[3]}/${m[2]}/${m[1]}`:String(value);
+}
 function generateContract(blank=false){
-let e=blank?{}:emp(contractEmployee.value);
+const employeeId=document.getElementById('contractEmployee')?.value||'';
+let e=blank?{}:emp(employeeId);
+const selectedStartDate=document.getElementById('contractStartDate')?.value||'';
 const cv=(v)=>blank?'':(v||'');
 const r=(l,v='')=>`<div class="contract-row"><div class="contract-label">${l}</div><div class="contract-value"><div class="contract-line">${v||''}</div></div></div>`;
 contractPrint.innerHTML=`<div class="a4 contract-a4">${header('EMPLOYMENT<br>CONTRACT')}
@@ -944,7 +951,7 @@ ${r('Income Tax No.',cv(e.tax))}
 <div class="contract-section-title">C. EMPLOYMENT DETAILS</div>
 ${r('Position',cv(e.position))}
 ${r('Department',cv(e.department))}
-${r('Start Date',cv(contractStartDate.value))}
+${r('Start Date',blank?'':formatDateMY(selectedStartDate))}
 ${r('Contract Type',cv(contractType.value))}
 ${r('Probation Period',cv(contractProbation.value||db.settings.probation||'3 months'))}
 ${r('Work Location',cv(contractLocation.value))}
@@ -1188,7 +1195,7 @@ const _refreshAllV44=refreshAll;refreshAll=function(){_refreshAllV44();refreshLe
 ;(db.outstations||[]).forEach((r,i)=>{r.id=r.id||'OUT-'+String(i+1).padStart(4,'0');r.attachments=r.attachments||[]});
 ;(db.exceptions||[]).forEach((r,i)=>{r.id=r.id||'ATT-'+String(i+1).padStart(4,'0');r.attachments=r.attachments||[]});
 ;(db.claims||[]).forEach(r=>{r.attachments=r.attachments||[];if(r.receipt&&!r.attachments.some(f=>f.data===r.receipt.data))r.attachments.push(r.receipt)});
-db.version='4.4.1';
+db.version='4.4.2';
 
 </script>
 </body></html>
