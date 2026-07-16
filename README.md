@@ -1,11 +1,12 @@
-# GME HRMS Professional v4.4.1 PWA
+# GME HRMS Professional v4.5 PWA
 
-GitHub Pages-ready HRMS.
+GitHub Pages-ready HRMS with English (default), Bahasa Melayu, and Chinese language switching.
 
-## New in v4.4.1
-- Multiple supporting attachments for Claims, Leave, Attendance Exceptions and Outstation Allowance
-- Editable and searchable registers for Leave, Attendance Exceptions and Outstation records
-- Open/delete attachments from each saved record
-- Existing JSON backups remain compatible
+## Install
+Upload all files in this folder to the root of your GitHub repository, then enable GitHub Pages from the main branch.
 
-Upload all files in this folder to the root of your GitHub repository. Do not upload private JSON backups to a public repository.
+## Language
+Use the language selector in the top bar or side menu. The selected language is saved in the browser. English remains the default for new devices.
+
+## Privacy
+Do not upload employee JSON backups or attachments to a public GitHub repository. Application records remain in the browser until exported.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GME HRMS Professional v4.4.2 PWA</title>
+<title>GME HRMS Professional v4.4.1 PWA</title>
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -166,10 +166,15 @@ input[type=number]{text-align:right}.btn{border:0;border-radius:7px;padding:10px
 @media(max-width:800px){.ledger-summary{grid-template-columns:1fr 1fr}.filter-bar{grid-template-columns:1fr 1fr}.filter-bar .btn{width:100%}}
 @media(max-width:480px){.ledger-summary{grid-template-columns:1fr}.filter-bar{grid-template-columns:1fr}}
 
+
+/* v4.5 multilingual language switcher */
+.language-switcher{width:auto;min-width:105px;padding:7px 9px;border-radius:8px;border:1px solid #666;background:#fff;color:#111;font-weight:800;font-size:12px}
+.language-panel{margin:0 0 14px;padding:10px;background:#1d1d1d;border:1px solid #333;border-radius:9px}.language-panel label{color:#ddd;font-size:11px}.language-panel .language-switcher{width:100%;margin-top:5px}
+@media(max-width:800px){.mobile-topbar{gap:7px}.mobile-topbar strong{flex:1}.mobile-topbar .language-switcher{min-width:86px;max-width:96px;padding:7px 5px;font-size:11px}.mobile-topbar .pwa-state{display:none}}
 </style>
 </head>
 <body>
-<div class="mobile-topbar no-print"><button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰ Menu</button><strong>GME HRMS v4.4</strong><span id="pwaState" class="pwa-state">Ready</span></div>
+<div class="mobile-topbar no-print"><button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰ Menu</button><strong>GME HRMS v4.5</strong><select id="languageSwitcherMobile" class="language-switcher" onchange="setLanguage(this.value)" aria-label="Language"><option value="en">English</option><option value="ms">Bahasa Melayu</option><option value="zh">中文</option></select><span id="pwaState" class="pwa-state">Ready</span></div>
 <div id="offlineBanner" class="offline-banner">Offline mode — changes remain saved on this device</div>
 <div class="app">
 <aside class="sidebar no-print">
@@ -916,15 +921,8 @@ function refreshReports(){
  if(document.getElementById('companyExpenseReportTable')) companyExpenseReportTable.innerHTML='<tr><th>No.</th><th>Date</th><th>Supplier</th><th>Category</th><th>Paid From</th><th>Amount</th><th>Status</th></tr>'+(db.companyExpenses||[]).map(x=>`<tr><td>${escapeHtml(x.no||'')}</td><td>${escapeHtml(x.date||'')}</td><td>${escapeHtml(x.supplier||'')}</td><td>${escapeHtml(x.category||'')}</td><td>${escapeHtml(x.account||'')}</td><td>RM ${money(x.amount)}</td><td>${escapeHtml(x.status||'')}</td></tr>`).join('');
 }
 
-function formatDateMY(value){
- if(!value)return '';
- const m=String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
- return m?`${m[3]}/${m[2]}/${m[1]}`:String(value);
-}
 function generateContract(blank=false){
-const employeeId=document.getElementById('contractEmployee')?.value||'';
-let e=blank?{}:emp(employeeId);
-const selectedStartDate=document.getElementById('contractStartDate')?.value||'';
+let e=blank?{}:emp(contractEmployee.value);
 const cv=(v)=>blank?'':(v||'');
 const r=(l,v='')=>`<div class="contract-row"><div class="contract-label">${l}</div><div class="contract-value"><div class="contract-line">${v||''}</div></div></div>`;
 contractPrint.innerHTML=`<div class="a4 contract-a4">${header('EMPLOYMENT<br>CONTRACT')}
@@ -951,7 +949,7 @@ ${r('Income Tax No.',cv(e.tax))}
 <div class="contract-section-title">C. EMPLOYMENT DETAILS</div>
 ${r('Position',cv(e.position))}
 ${r('Department',cv(e.department))}
-${r('Start Date',blank?'':formatDateMY(selectedStartDate))}
+${r('Start Date',cv(contractStartDate.value))}
 ${r('Contract Type',cv(contractType.value))}
 ${r('Probation Period',cv(contractProbation.value||db.settings.probation||'3 months'))}
 ${r('Work Location',cv(contractLocation.value))}
@@ -1195,7 +1193,52 @@ const _refreshAllV44=refreshAll;refreshAll=function(){_refreshAllV44();refreshLe
 ;(db.outstations||[]).forEach((r,i)=>{r.id=r.id||'OUT-'+String(i+1).padStart(4,'0');r.attachments=r.attachments||[]});
 ;(db.exceptions||[]).forEach((r,i)=>{r.id=r.id||'ATT-'+String(i+1).padStart(4,'0');r.attachments=r.attachments||[]});
 ;(db.claims||[]).forEach(r=>{r.attachments=r.attachments||[];if(r.receipt&&!r.attachments.some(f=>f.data===r.receipt.data))r.attachments.push(r.receipt)});
-db.version='4.4.2';
+db.version='4.5';
 
+
+
+/* ===== v4.5 Multilingual UI: English (default), Bahasa Melayu, Chinese ===== */
+const GME_LANG_KEY='gmeHRMSLanguage';
+const GME_I18N={
+ ms:{
+ 'Menu':'Menu','Ready':'Sedia','Online':'Dalam talian','Offline':'Luar talian','Home':'Utama','Staff':'Kakitangan','Payroll':'Gaji','Claims':'Tuntutan','More':'Lagi',
+ 'Dashboard':'Papan Pemuka','Employee Master':'Rekod Induk Pekerja','Employment Contract':'Kontrak Pekerjaan','Payroll & Payslip':'Gaji & Slip Gaji','Salary Advance':'Pendahuluan Gaji','Outstation Allowance':'Elaun Luar Stesen','Leave Application':'Permohonan Cuti','Attendance Exception':'Pengecualian Kehadiran','Asset Issue':'Pengeluaran Aset','Vehicle Assignment':'Penugasan Kenderaan','Expense Management':'Pengurusan Perbelanjaan','Company Account Expenses':'Perbelanjaan Akaun Syarikat','Blank Forms':'Borang Kosong','Reports':'Laporan','Settings':'Tetapan','Backup Manager':'Pengurus Sandaran',
+ 'Active Employees':'Pekerja Aktif','Salary Advance Records':'Rekod Pendahuluan Gaji','Leave Records':'Rekod Cuti','Outstation Records':'Rekod Luar Stesen','Attendance Exceptions':'Pengecualian Kehadiran','Assets Issued':'Aset Dikeluarkan','Vehicle Assignments':'Penugasan Kenderaan','Pending Claims':'Tuntutan Belum Selesai','Claims This Month':'Tuntutan Bulan Ini','Staff Activities':'Aktiviti Kakitangan',
+ 'Employee Name':'Nama Pekerja','Employee ID':'ID Pekerja','Status':'Status','IC No.':'No. IC','Position':'Jawatan','Department':'Jabatan','Bank / Account No.':'Bank / No. Akaun','EPF / KWSP No.':'No. EPF / KWSP','SOCSO / PERKESO No.':'No. SOCSO / PERKESO','Income Tax / LHDN No.':'No. Cukai Pendapatan / LHDN','Basic Salary':'Gaji Asas','Fixed Allowance':'Elaun Tetap','Annual Leave Entitlement':'Kelayakan Cuti Tahunan','Sick Leave Entitlement':'Kelayakan Cuti Sakit','New Employee':'Pekerja Baharu','Save Employee':'Simpan Pekerja','Delete Selected':'Padam Pilihan','Employee List':'Senarai Pekerja','Employee Document Vault':'Simpanan Dokumen Pekerja','Document Type':'Jenis Dokumen','Document File':'Fail Dokumen','Remarks':'Catatan','Add Document':'Tambah Dokumen','Open':'Buka','Delete':'Padam','Edit':'Edit','Edit / Files':'Edit / Fail',
+ 'Select Employee':'Pilih Pekerja','Employment Start Date':'Tarikh Mula Kerja','Contract Type':'Jenis Kontrak','Probation Period':'Tempoh Percubaan','Working Hours':'Waktu Bekerja','Rest Day':'Hari Rehat','Annual Leave':'Cuti Tahunan','Notice Period':'Tempoh Notis','Work Location':'Lokasi Kerja','Additional Terms / Remarks':'Syarat Tambahan / Catatan','Generate Filled Contract':'Jana Kontrak Berisi','Generate Blank Contract':'Jana Kontrak Kosong','Print / Save PDF':'Cetak / Simpan PDF',
+ 'Payroll Month':'Bulan Gaji','Payment Date':'Tarikh Bayaran','Outstation Allowance':'Elaun Luar Stesen','Commission / OT':'Komisen / OT','Bonus / Adjustment':'Bonus / Pelarasan','Salary Advance Deduction':'Potongan Pendahuluan Gaji','Other Deduction':'Potongan Lain','Approved Claims Reimbursement (Same Month)':'Bayaran Balik Tuntutan Diluluskan (Bulan Sama)','Claims Included':'Tuntutan Disertakan','Refresh Approved Claims':'Muat Semula Tuntutan Diluluskan','Generate Payslip':'Jana Slip Gaji','Mark Included Claims Paid':'Tanda Tuntutan Dibayar',
+ 'Request Date':'Tarikh Permohonan','Requested Amount':'Jumlah Dimohon','Deduct From Month':'Tolak Dari Bulan','Monthly Deduction':'Potongan Bulanan','Case Type':'Jenis Kes','Approval Status':'Status Kelulusan','Approved By':'Diluluskan Oleh','Reason / Details':'Sebab / Butiran','Save Record':'Simpan Rekod','Generate Filled Form':'Jana Borang Berisi','Generate Blank Form':'Jana Borang Kosong','Supporting Attachments':'Lampiran Sokongan','Search Records':'Cari Rekod','Filter by Status':'Tapis mengikut Status','New Record':'Rekod Baharu',
+ 'Outstation Start Date':'Tarikh Mula Luar Stesen','Outstation End Date':'Tarikh Tamat Luar Stesen','No. of Days':'Bil. Hari','Default Rate / Day (RM)':'Kadar Lalai / Hari (RM)','Manual Amount (Optional)':'Jumlah Manual (Pilihan)','Total Allowance (RM)':'Jumlah Elaun (RM)','Customer / Location':'Pelanggan / Lokasi','Purpose / Remarks':'Tujuan / Catatan','Save Outstation Record':'Simpan Rekod Luar Stesen',
+ 'Application Date':'Tarikh Permohonan','Start Date':'Tarikh Mula','End Date':'Tarikh Tamat','Annual Leave Balance':'Baki Cuti Tahunan','Leave Type':'Jenis Cuti','Sick Leave':'Cuti Sakit','Emergency Leave':'Cuti Kecemasan','Unpaid Leave':'Cuti Tanpa Gaji','Compassionate Leave':'Cuti Ihsan','Others':'Lain-lain','Reason':'Sebab',
+ 'Date':'Tarikh','Exception Type':'Jenis Pengecualian','Salary Impact':'Kesan Gaji','Deduction Amount (RM)':'Jumlah Potongan (RM)','Save Exception':'Simpan Pengecualian','Absent':'Tidak Hadir','Late':'Lewat','Half Day':'Separuh Hari','Early Leave':'Balik Awal','No Show':'Tidak Hadir Tanpa Maklum','Medical Leave / MC':'Cuti Sakit / MC','Work From Home':'Bekerja Dari Rumah','No Deduction':'Tiada Potongan','Half-day Deduction':'Potongan Separuh Hari','Full-day Deduction':'Potongan Sehari','Manual Deduction':'Potongan Manual',
+ 'Claim No.':'No. Tuntutan','Claimant / Employee':'Penuntut / Pekerja','Claim Date':'Tarikh Tuntutan','Expense Date':'Tarikh Perbelanjaan','Expense Type':'Jenis Perbelanjaan','Category / Item':'Kategori / Item','Customer / Supplier (Optional)':'Pelanggan / Pembekal (Pilihan)','Project / Job (Optional)':'Projek / Kerja (Pilihan)','Payment Made By':'Bayaran Dibuat Dengan','Budget Amount (RM)':'Jumlah Bajet (RM)','Claimed / Actual Amount (RM)':'Jumlah Dituntut / Sebenar (RM)','Variance (RM)':'Perbezaan (RM)','Budget Status':'Status Bajet','Claim Status':'Status Tuntutan','Reimbursement Method':'Kaedah Bayaran Balik','Description / Business Purpose':'Penerangan / Tujuan Perniagaan','Receipt / Supporting Document':'Resit / Dokumen Sokongan','Receipt Remarks':'Catatan Resit','New Claim':'Tuntutan Baharu','Save Claim':'Simpan Tuntutan','Claims & Reimbursement Register':'Daftar Tuntutan & Bayaran Balik',
+ 'Company Settings':'Tetapan Syarikat','Company Name':'Nama Syarikat','Company Registration No.':'No. Pendaftaran Syarikat','Telephone':'Telefon','Email':'E-mel','Address':'Alamat','Working Hours (Mon–Fri)':'Waktu Bekerja (Isn–Jum)','Working Hours (Saturday)':'Waktu Bekerja (Sabtu)','Public Holiday Policy':'Polisi Cuti Umum','Default Probation Period':'Tempoh Percubaan Lalai','Default Notice Period':'Tempoh Notis Lalai','Salary Payment Day':'Hari Bayaran Gaji','Outstation Allowance Rate':'Kadar Elaun Luar Stesen','Employer EPF No.':'No. EPF Majikan','Employer PERKESO No.':'No. PERKESO Majikan','Employer LHDN No.':'No. LHDN Majikan','Save Settings':'Simpan Tetapan',
+ 'Pending Approval':'Menunggu Kelulusan','Approved':'Diluluskan','Rejected':'Ditolak','Paid':'Dibayar','Draft':'Draf','Submitted':'Dihantar','Closed':'Ditutup','Active':'Aktif','Resigned':'Berhenti','Permanent':'Tetap','Probation':'Percubaan','Part-Time':'Sambilan','Fixed Term':'Tempoh Tetap','Bank Transfer':'Pindahan Bank','Cash':'Tunai','Not Applicable':'Tidak Berkenaan','Search':'Cari','Action':'Tindakan','Files':'Fail','Amount':'Jumlah','Total':'Jumlah','Employee':'Pekerja','Type':'Jenis','Description':'Penerangan','Category':'Kategori','Supplier':'Pembekal','Reference':'Rujukan','Save':'Simpan','Cancel':'Batal','Close':'Tutup','Continue Working':'Teruskan Kerja','Backup Now':'Sandar Sekarang','Restore JSON':'Pulihkan JSON','Exit System':'Keluar Sistem','Language':'Bahasa'
+ },
+ zh:{
+ 'Menu':'菜单','Ready':'就绪','Online':'在线','Offline':'离线','Home':'主页','Staff':'员工','Payroll':'薪资','Claims':'报销','More':'更多',
+ 'Dashboard':'仪表板','Employee Master':'员工资料','Employment Contract':'雇佣合同','Payroll & Payslip':'薪资与工资单','Salary Advance':'预支薪资','Outstation Allowance':'外勤津贴','Leave Application':'请假申请','Attendance Exception':'考勤异常','Asset Issue':'资产发放','Vehicle Assignment':'车辆分配','Expense Management':'费用管理','Company Account Expenses':'公司账户支出','Blank Forms':'空白表格','Reports':'报表','Settings':'设置','Backup Manager':'备份管理',
+ 'Active Employees':'在职员工','Salary Advance Records':'预支薪资记录','Leave Records':'请假记录','Outstation Records':'外勤记录','Attendance Exceptions':'考勤异常记录','Assets Issued':'已发放资产','Vehicle Assignments':'车辆分配记录','Pending Claims':'待处理报销','Claims This Month':'本月报销','Staff Activities':'员工活动',
+ 'Employee Name':'员工姓名','Employee ID':'员工编号','Status':'状态','IC No.':'身份证号码','Position':'职位','Department':'部门','Bank / Account No.':'银行 / 账号','EPF / KWSP No.':'EPF / KWSP号码','SOCSO / PERKESO No.':'SOCSO / PERKESO号码','Income Tax / LHDN No.':'所得税 / LHDN号码','Basic Salary':'基本工资','Fixed Allowance':'固定津贴','Annual Leave Entitlement':'年假额度','Sick Leave Entitlement':'病假额度','New Employee':'新增员工','Save Employee':'保存员工','Delete Selected':'删除所选','Employee List':'员工列表','Employee Document Vault':'员工文件库','Document Type':'文件类型','Document File':'文件','Remarks':'备注','Add Document':'添加文件','Open':'打开','Delete':'删除','Edit':'编辑','Edit / Files':'编辑 / 文件',
+ 'Select Employee':'选择员工','Employment Start Date':'入职日期','Contract Type':'合同类型','Probation Period':'试用期','Working Hours':'工作时间','Rest Day':'休息日','Annual Leave':'年假','Notice Period':'通知期','Work Location':'工作地点','Additional Terms / Remarks':'附加条款 / 备注','Generate Filled Contract':'生成已填写合同','Generate Blank Contract':'生成空白合同','Print / Save PDF':'打印 / 保存PDF',
+ 'Payroll Month':'薪资月份','Payment Date':'付款日期','Commission / OT':'佣金 / 加班费','Bonus / Adjustment':'奖金 / 调整','Salary Advance Deduction':'预支薪资扣款','Other Deduction':'其他扣款','Approved Claims Reimbursement (Same Month)':'已批准报销（同月）','Claims Included':'包含的报销','Refresh Approved Claims':'刷新已批准报销','Generate Payslip':'生成工资单','Mark Included Claims Paid':'标记报销已支付',
+ 'Request Date':'申请日期','Requested Amount':'申请金额','Deduct From Month':'扣款月份','Monthly Deduction':'每月扣款','Case Type':'个案类型','Approval Status':'审批状态','Approved By':'批准人','Reason / Details':'原因 / 详情','Save Record':'保存记录','Generate Filled Form':'生成已填写表格','Generate Blank Form':'生成空白表格','Supporting Attachments':'支持文件','Search Records':'搜索记录','Filter by Status':'按状态筛选','New Record':'新记录',
+ 'Outstation Start Date':'外勤开始日期','Outstation End Date':'外勤结束日期','No. of Days':'天数','Default Rate / Day (RM)':'默认每日津贴（RM）','Manual Amount (Optional)':'手动金额（可选）','Total Allowance (RM)':'津贴总额（RM）','Customer / Location':'客户 / 地点','Purpose / Remarks':'用途 / 备注','Save Outstation Record':'保存外勤记录',
+ 'Application Date':'申请日期','Start Date':'开始日期','End Date':'结束日期','Annual Leave Balance':'年假余额','Leave Type':'假期类型','Sick Leave':'病假','Emergency Leave':'紧急假','Unpaid Leave':'无薪假','Compassionate Leave':'恩恤假','Others':'其他','Reason':'原因',
+ 'Date':'日期','Exception Type':'异常类型','Salary Impact':'薪资影响','Deduction Amount (RM)':'扣款金额（RM）','Save Exception':'保存异常','Absent':'缺勤','Late':'迟到','Half Day':'半天','Early Leave':'早退','No Show':'无故缺勤','Medical Leave / MC':'病假 / MC','Work From Home':'居家办公','No Deduction':'不扣款','Half-day Deduction':'扣半天','Full-day Deduction':'扣一天','Manual Deduction':'手动扣款',
+ 'Claim No.':'报销编号','Claimant / Employee':'申请人 / 员工','Claim Date':'申请日期','Expense Date':'费用日期','Expense Type':'费用类型','Category / Item':'类别 / 项目','Customer / Supplier (Optional)':'客户 / 供应商（可选）','Project / Job (Optional)':'项目 / 工作（可选）','Payment Made By':'付款方式','Budget Amount (RM)':'预算金额（RM）','Claimed / Actual Amount (RM)':'报销 / 实际金额（RM）','Variance (RM)':'差额（RM）','Budget Status':'预算状态','Claim Status':'报销状态','Reimbursement Method':'报销方式','Description / Business Purpose':'说明 / 商业用途','Receipt / Supporting Document':'收据 / 支持文件','Receipt Remarks':'收据备注','New Claim':'新增报销','Save Claim':'保存报销','Claims & Reimbursement Register':'报销与付款记录',
+ 'Company Settings':'公司设置','Company Name':'公司名称','Company Registration No.':'公司注册号','Telephone':'电话','Email':'电邮','Address':'地址','Working Hours (Mon–Fri)':'工作时间（周一至周五）','Working Hours (Saturday)':'工作时间（周六）','Public Holiday Policy':'公共假期政策','Default Probation Period':'默认试用期','Default Notice Period':'默认通知期','Salary Payment Day':'发薪日','Outstation Allowance Rate':'外勤津贴率','Employer EPF No.':'雇主EPF号码','Employer PERKESO No.':'雇主PERKESO号码','Employer LHDN No.':'雇主LHDN号码','Save Settings':'保存设置',
+ 'Pending Approval':'待批准','Approved':'已批准','Rejected':'已拒绝','Paid':'已支付','Draft':'草稿','Submitted':'已提交','Closed':'已关闭','Active':'在职','Resigned':'已离职','Permanent':'永久','Probation':'试用','Part-Time':'兼职','Fixed Term':'固定期限','Bank Transfer':'银行转账','Cash':'现金','Not Applicable':'不适用','Search':'搜索','Action':'操作','Files':'文件','Amount':'金额','Total':'总计','Employee':'员工','Type':'类型','Description':'说明','Category':'类别','Supplier':'供应商','Reference':'参考编号','Save':'保存','Cancel':'取消','Close':'关闭','Continue Working':'继续工作','Backup Now':'立即备份','Restore JSON':'恢复JSON','Exit System':'退出系统','Language':'语言'
+ }
+};
+const _gmeTextOriginal=new WeakMap();
+function gmeTranslateTextNode(node,lang){if(!node||node.nodeType!==3)return;let original=_gmeTextOriginal.get(node);if(original===undefined){original=node.nodeValue;_gmeTextOriginal.set(node,original)}if(lang==='en'){node.nodeValue=original;return}const trimmed=original.trim();if(!trimmed)return;const translated=GME_I18N[lang]?.[trimmed];if(translated){const lead=original.match(/^\s*/)?.[0]||'';const trail=original.match(/\s*$/)?.[0]||'';node.nodeValue=lead+translated+trail}}
+function gmeTranslateElement(root,lang){if(!root)return;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>{const p=n.parentElement;if(!p||['SCRIPT','STYLE','TEXTAREA'].includes(p.tagName))return NodeFilter.FILTER_REJECT;return NodeFilter.FILTER_ACCEPT}});let n;while(n=walker.nextNode())gmeTranslateTextNode(n,lang);root.querySelectorAll?.('[placeholder],[title],[aria-label]').forEach(el=>{['placeholder','title','aria-label'].forEach(attr=>{if(!el.hasAttribute(attr))return;const key='i18nOriginal'+attr.replace('-','');if(!el.dataset[key])el.dataset[key]=el.getAttribute(attr);const original=el.dataset[key];el.setAttribute(attr,lang==='en'?original:(GME_I18N[lang]?.[original]||original))})})}
+function setLanguage(lang='en'){if(!['en','ms','zh'].includes(lang))lang='en';localStorage.setItem(GME_LANG_KEY,lang);document.documentElement.lang=lang==='zh'?'zh-CN':lang;document.querySelectorAll('.language-switcher').forEach(s=>s.value=lang);gmeTranslateElement(document.body,lang)}
+function currentLanguage(){return localStorage.getItem(GME_LANG_KEY)||'en'}
+const _gmeOriginalRefreshAll=refreshAll;refreshAll=function(){const r=_gmeOriginalRefreshAll.apply(this,arguments);setTimeout(()=>setLanguage(currentLanguage()),0);return r}
+const _gmeOriginalShowPage=showPage;showPage=function(){const r=_gmeOriginalShowPage.apply(this,arguments);setTimeout(()=>setLanguage(currentLanguage()),0);return r}
+const _gmeObserver=new MutationObserver(mutations=>{const lang=currentLanguage();if(lang==='en')return;for(const m of mutations)for(const node of m.addedNodes)if(node.nodeType===1)gmeTranslateElement(node,lang);else if(node.nodeType===3)gmeTranslateTextNode(node,lang)});
+window.addEventListener('DOMContentLoaded',()=>{setLanguage(currentLanguage());_gmeObserver.observe(document.body,{childList:true,subtree:true})});
 </script>
 </body></html>
