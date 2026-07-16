@@ -1,6 +1,4 @@
 *.json
 !manifest.webmanifest
-Backups/
-backup/
-receipts/
-employee-data/
+*.backup
+*_Backup_*
